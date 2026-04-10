@@ -8,7 +8,7 @@ import (
 
 func init() {
 	if err := godotenv.Load(); err != nil {
-		log.Println("Aviso: não foi possível carregar .env (talvez ele não exista?):", err)
+		slog.Error("Aviso: não foi possível carregar .env (talvez ele não exista?):", err)
 	}
 }
 
