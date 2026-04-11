@@ -4,6 +4,7 @@ import (
 		"log/slog"
 		"os"
     "net/http"
+		"arthemis-brain/internal/handlers"
     "github.com/go-chi/chi/v5"
     "github.com/go-chi/chi/v5/middleware"
 )
@@ -14,6 +15,8 @@ func main() {
   r.Get("/", func(w http.ResponseWriter, r *http.Request) {
       w.Write([]byte("Hello World!"))
   })
+
+	r.Get("/health", handlers.HealthCheck)
 
 	textHandler := slog.NewTextHandler(os.Stdout, &slog.HandlerOptions{
 		Level: slog.LevelDebug,
