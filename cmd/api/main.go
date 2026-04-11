@@ -1,12 +1,12 @@
 package main
 
 import (
-		"log/slog"
-		"os"
-    "net/http"
-		"arthemis-brain/internal/handlers"
-    "github.com/go-chi/chi/v5"
-    "github.com/go-chi/chi/v5/middleware"
+	"log/slog"
+	"os"
+  "net/http"
+	"arthemis-brain/internal/handlers"
+  "github.com/go-chi/chi/v5"
+  "github.com/go-chi/chi/v5/middleware"
 )
 
 func main() {
