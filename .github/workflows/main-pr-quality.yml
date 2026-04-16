@@ -30,25 +30,45 @@ jobs:
           fetch-depth: 0
 
       - name: Setup Go
-        uses: actions/setup-go@v5
+        uses: actions/setup-go@v6
         with:
           go-version-file: go.mod
           cache: true
 
-      - name: Run unit tests with coverage
-        run: go test ./... -covermode=atomic -coverprofile=coverage.out -json > report.json
+      - name: Format check (gofmt)
+        run: |
+          test -z "$(gofmt -l .)" || (echo "gofmt needed"; gofmt -l .; exit 1)
 
-      - name: SonarQube scan
-        uses: SonarSource/sonarqube-scan-action@v6
-        env:
-          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-          SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
+      - name: Vet
+        if: ${{ always() }}
+        run: go vet ./...
 
-      - name: Check SonarQube Quality Gate
-        uses: SonarSource/sonarqube-quality-gate-action@v1.2.0
-        timeout-minutes: 10
+      - name: Lint (golangci-lint)
+        if: ${{ always() }}
+        uses: golangci/golangci-lint-action@v9
         with:
-          pollingTimeoutSec: 600
+          version: latest
+          args: --timeout=5m
+
+      - name: Tests (race + coverage)
+        if: ${{ always() }}
+        run: |
+          go test ./... -count=1 -race -covermode=atomic -coverprofile=coverage.out
+
+      - name: Upload coverage artifact
+        if: ${{ always() }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage
+          path: coverage.out
+          if-no-files-found: ignore
+
+      - name: SonarQube Scan
+        if: ${{ always() }}
+        uses: SonarSource/sonarqube-scan-action@v6
+        with:
+          args: >
+            -Dsonar.go.coverage.reportPaths=coverage.out
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
           SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
