@@ -22,6 +22,9 @@ jobs:
   quality:
     if: github.event.pull_request.draft == false
     runs-on: ubuntu-latest
+    env:
+      SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+      SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
 
     steps:
       - name: Checkout repository
@@ -32,8 +35,12 @@ jobs:
       - name: Setup Go
         uses: actions/setup-go@v6
         with:
-          go-version-file: go.mod
+          go-version: "1.25.4"
           cache: true
+          check-latest: true
+
+      - name: Download Go dependencies
+        run: go mod download
 
       - name: Format check (gofmt)
         run: |
@@ -50,7 +57,7 @@ jobs:
           version: latest
           args: --timeout=5m
 
-      - name: Tests (race + coverage)
+      - name: Run unit tests with coverage
         if: ${{ always() }}
         run: |
           go test ./... -count=1 -race -covermode=atomic -coverprofile=coverage.out
@@ -64,11 +71,8 @@ jobs:
           if-no-files-found: ignore
 
       - name: SonarQube Scan
-        if: ${{ always() }}
+        if: ${{ always() && env.SONAR_TOKEN != '' && env.SONAR_HOST_URL != '' }}
         uses: SonarSource/sonarqube-scan-action@v6
         with:
           args: >
             -Dsonar.go.coverage.reportPaths=coverage.out
-        env:
-          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-          SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
