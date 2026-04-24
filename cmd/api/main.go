@@ -6,14 +6,17 @@ import (
 	"os"
 
 	"arthemis-brain/internal/handlers"
+	ownMiddleware "arthemis-brain/internal/middlewares"
 
 	"github.com/go-chi/chi/v5"
-	"github.com/go-chi/chi/v5/middleware"
+	chiMiddleware "github.com/go-chi/chi/v5/middleware"
 )
 
 func main() {
 	r := chi.NewRouter()
-	r.Use(middleware.Logger)
+	r.Use(chiMiddleware.Logger)
+	r.Use(ownMiddleware.PermissionMiddleware)
+
 	r.Get("/", func(w http.ResponseWriter, r *http.Request) {
 		w.Write([]byte("Hello World!"))
 	})

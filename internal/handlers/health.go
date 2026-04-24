@@ -11,14 +11,6 @@ import (
 )
 
 func HealthCheck(w http.ResponseWriter, r *http.Request) {
-	// role := r.Header.Get("X-User-Role")
-	role := "not-admin"
-
-	if !CheckPermission(role, "health") {
-		w.Write([]byte("Você não tem permissão para acessar este recurso"))
-		return
-	}
-
 	w.Header().Set("content-type", "application/json")
 	w.WriteHeader(http.StatusOK)
 
