@@ -2,21 +2,33 @@ package main
 
 import (
 	"log/slog"
+	"net/http"
 	"os"
-  "net/http"
+
+	"arthemis-brain/internal/database"
 	"arthemis-brain/internal/handlers"
-  "github.com/go-chi/chi/v5"
-  "github.com/go-chi/chi/v5/middleware"
+	ownMiddleware "arthemis-brain/internal/middlewares"
+
+	"github.com/go-chi/chi/v5"
+	chiMiddleware "github.com/go-chi/chi/v5/middleware"
 )
 
 func main() {
-  r := chi.NewRouter()
-  r.Use(middleware.Logger)
-  r.Get("/", func(w http.ResponseWriter, r *http.Request) {
-      w.Write([]byte("Hello World!"))
-  })
+	r := chi.NewRouter()
+	r.Use(chiMiddleware.Logger)
+	r.Use(ownMiddleware.PermissionMiddleware)
 
-	r.Get("/health", handlers.HealthCheck)
+	db, err := database.ConnectToDatabase()
+	if err != nil {
+		db = nil
+	}
+	r.Get("/", func(w http.ResponseWriter, r *http.Request) {
+		w.Write([]byte("Hello World!"))
+	})
+
+	healthHandler := handlers.HealthHandler(db)
+
+	r.Get("/health", healthHandler.HealthCheck)
 
 	textHandler := slog.NewTextHandler(os.Stdout, &slog.HandlerOptions{
 		Level: slog.LevelDebug,
@@ -25,8 +37,7 @@ func main() {
 	logger := slog.New(textHandler)
 
 	logger.Info("Servidor iniciado!")
-	logger.Info("http://localhost:3000")
+	logger.Info("http://localhost:8081")
 
-	http.ListenAndServe(":3000", r)
+	http.ListenAndServe(":8081", r)
 }
-
