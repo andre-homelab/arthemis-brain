@@ -5,24 +5,24 @@ import (
 	"net/http"
 	"time"
 
-	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
-	//"internal/env"
 )
 
-func HealthCheck(w http.ResponseWriter, r *http.Request) {
+type DBStore struct {
+	db *gorm.DB
+}
+
+func HealthHandler(db *gorm.DB) *DBStore {
+	return &DBStore{db}
+}
+
+func (db *DBStore) HealthCheck(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("content-type", "application/json")
 	w.WriteHeader(http.StatusOK)
 
-	connectionString := "host=arthemis-brain-postgres port=5432 user=app_user password=app_password dbname=app_db sslmode=disable"
-
-	_, err := gorm.Open(
-		postgres.Open(connectionString),
-		&gorm.Config{},
-	)
-
 	dbIsUp := "available"
-	if err != nil {
+
+	if db == nil {
 		dbIsUp = "unavailable"
 	}
 

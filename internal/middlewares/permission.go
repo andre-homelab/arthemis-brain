@@ -1,6 +1,9 @@
 package middlewares
 
-import "net/http"
+import (
+	"fmt"
+	"net/http"
+)
 
 func PermissionMiddleware(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
@@ -8,7 +11,8 @@ func PermissionMiddleware(next http.Handler) http.Handler {
 		endpoint := r.URL.Path
 
 		if !CheckPermission(role, endpoint) {
-			http.Error(w, "Você não tem permissão para acessar este recurso", http.StatusForbidden)
+			message := fmt.Sprintf("Você não tem permissão para acessar %s", endpoint)
+			http.Error(w, message, http.StatusForbidden)
 			return
 		}
 

@@ -5,6 +5,7 @@ import (
 	"net/http"
 	"os"
 
+	"arthemis-brain/internal/database"
 	"arthemis-brain/internal/handlers"
 	ownMiddleware "arthemis-brain/internal/middlewares"
 
@@ -17,11 +18,17 @@ func main() {
 	r.Use(chiMiddleware.Logger)
 	r.Use(ownMiddleware.PermissionMiddleware)
 
+	db, err := database.ConnectToDatabase()
+	if err != nil {
+		db = nil
+	}
 	r.Get("/", func(w http.ResponseWriter, r *http.Request) {
 		w.Write([]byte("Hello World!"))
 	})
 
-	r.Get("/health", handlers.HealthCheck)
+	healthHandler := handlers.HealthHandler(db)
+
+	r.Get("/health", healthHandler.HealthCheck)
 
 	textHandler := slog.NewTextHandler(os.Stdout, &slog.HandlerOptions{
 		Level: slog.LevelDebug,

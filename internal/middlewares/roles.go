@@ -3,9 +3,9 @@ package middlewares
 import "slices"
 
 var rolesMap = map[string][]string{
-	"visitor": {},
-	"manager": {"health"},
-	"admin":   {"health"},
+	"visitor": {"/"},
+	"manager": {"/", "/health"},
+	"admin":   {"/", "/health"},
 }
 
 func GetRoles() map[string][]string {
