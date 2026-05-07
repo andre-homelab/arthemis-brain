@@ -30,6 +30,9 @@ func main() {
 
 	r.Get("/health", healthHandler.HealthCheck)
 
+	proponentHandler := handlers.ProponentHandler(db)
+	r.Post("/proponent/create", proponentHandler.CreateProponent)
+
 	textHandler := slog.NewTextHandler(os.Stdout, &slog.HandlerOptions{
 		Level: slog.LevelDebug,
 	})
