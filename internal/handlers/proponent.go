@@ -26,7 +26,7 @@ func ProponentHandler(logger *slog.Logger, db *gorm.DB) *GlobalParams {
 // @license.url   http://www.apache.org/licenses/LICENSE-2.0.html
 
 // @host      localhost:8081
-// @BasePath  /proponent/create
+// @BasePath  /proponent/{id}
 
 // @securityDefinitions.basic  BasicAuth
 
@@ -53,14 +53,14 @@ func (g *GlobalParams) CreateProponent(w http.ResponseWriter, r *http.Request) {
 // @license.url   http://www.apache.org/licenses/LICENSE-2.0.html
 
 // @host      localhost:8081
-// @BasePath  /proponent/get
+// @BasePath  /proponent/{id}
 
 // @securityDefinitions.basic  BasicAuth
 
 func (g *GlobalParams) GetProponent(w http.ResponseWriter, r *http.Request) {
 	id := chi.URLParam(r, "id") // or mux.Vars(r)["id"] if using gorilla/mux
 	if id == "" {
-		utils.RespondError(w, http.StatusBadRequest, "ID não informado", nil)
+		utils.RespondError(w, http.StatusBadRequest, "ProponentID not found", nil)
 		return
 	}
 
@@ -68,10 +68,10 @@ func (g *GlobalParams) GetProponent(w http.ResponseWriter, r *http.Request) {
 	res := g.db.First(&proponent, "id = ?", id)
 	if res.Error != nil {
 		if errors.Is(res.Error, gorm.ErrRecordNotFound) {
-			utils.RespondError(w, http.StatusNotFound, "Proponente não encontrado", res.Error)
+			utils.RespondError(w, http.StatusNotFound, "Proponent not found", res.Error)
 			return
 		}
-		utils.RespondError(w, http.StatusInternalServerError, "Erro ao buscar o proponente", res.Error)
+		utils.RespondError(w, http.StatusInternalServerError, "Error finding proponent", res.Error)
 		return
 	}
 
@@ -87,14 +87,14 @@ func (g *GlobalParams) GetProponent(w http.ResponseWriter, r *http.Request) {
 // @license.url   http://www.apache.org/licenses/LICENSE-2.0.html
 
 // @host      localhost:8081
-// @BasePath  /proponent/update
+// @BasePath  /proponent/{id}
 
 // @securityDefinitions.basic  BasicAuth
 
 func (g *GlobalParams) UpdateProponent(w http.ResponseWriter, r *http.Request) {
 	id := chi.URLParam(r, "id")
 	if id == "" {
-		utils.RespondError(w, http.StatusBadRequest, "ID não informado", nil)
+		utils.RespondError(w, http.StatusBadRequest, "ProponentID not found", nil)
 		return
 	}
 
@@ -102,23 +102,23 @@ func (g *GlobalParams) UpdateProponent(w http.ResponseWriter, r *http.Request) {
 	res := g.db.First(&existing, "id = ?", id)
 	if res.Error != nil {
 		if errors.Is(res.Error, gorm.ErrRecordNotFound) {
-			utils.RespondError(w, http.StatusNotFound, "Proponente não encontrado", res.Error)
+			utils.RespondError(w, http.StatusNotFound, "Proponent not found", res.Error)
 			return
 		}
-		utils.RespondError(w, http.StatusInternalServerError, "Erro ao buscar o proponente", res.Error)
+		utils.RespondError(w, http.StatusInternalServerError, "Error finding proponent", res.Error)
 		return
 	}
 
 	var reqProponent models.Proponent
 	if err := json.NewDecoder(r.Body).Decode(&reqProponent); err != nil {
-		utils.RespondError(w, http.StatusBadRequest, "JSON inválido", err)
+		utils.RespondError(w, http.StatusBadRequest, "Invalid JSON", err)
 		return
 	}
 
+	res = g.db.Model(&existing).Updates(&reqProponent)
 	reqProponent.ID = existing.ID
-	res = g.db.Save(&reqProponent)
 	if res.Error != nil {
-		utils.RespondError(w, http.StatusInternalServerError, "Erro ao atualizar o proponente", res.Error)
+		utils.RespondError(w, http.StatusInternalServerError, "Error updating proponent", res.Error)
 		return
 	}
 
@@ -134,24 +134,24 @@ func (g *GlobalParams) UpdateProponent(w http.ResponseWriter, r *http.Request) {
 // @license.url   http://www.apache.org/licenses/LICENSE-2.0.html
 
 // @host      localhost:8081
-// @BasePath  /proponent/delete
+// @BasePath  /proponent/{id}
 
 // @securityDefinitions.basic  BasicAuth
 
 func (g *GlobalParams) DeleteProponent(w http.ResponseWriter, r *http.Request) {
 	id := chi.URLParam(r, "id")
 	if id == "" {
-		utils.RespondError(w, http.StatusBadRequest, "ID não informado", nil)
+		utils.RespondError(w, http.StatusBadRequest, "ProponentID not found", nil)
 		return
 	}
 
 	res := g.db.Delete(&models.Proponent{}, "id = ?", id)
 	if res.Error != nil {
-		utils.RespondError(w, http.StatusInternalServerError, "Erro ao deletar o proponente", res.Error)
+		utils.RespondError(w, http.StatusInternalServerError, "Error deleting proponent", res.Error)
 		return
 	}
 	if res.RowsAffected == 0 {
-		utils.RespondError(w, http.StatusNotFound, "Proponente não encontrado", nil)
+		utils.RespondError(w, http.StatusNotFound, "Proponent not found", nil)
 		return
 	}
 

@@ -26,7 +26,7 @@ func ProjectHandler(logger *slog.Logger, db *gorm.DB) *GlobalParams {
 // @license.url   http://www.apache.org/licenses/LICENSE-2.0.html
 
 // @host      localhost:8081
-// @BasePath  /project/create
+// @BasePath  /project/{id}
 
 // @securityDefinitions.basic  BasicAuth
 
@@ -70,7 +70,7 @@ func (g *GlobalParams) CreateProject(w http.ResponseWriter, r *http.Request) {
 // @license.url   http://www.apache.org/licenses/LICENSE-2.0.html
 
 // @host      localhost:8081
-// @BasePath  /project/get
+// @BasePath  /project/{id}
 
 // @securityDefinitions.basic  BasicAuth
 
@@ -104,7 +104,7 @@ func (g *GlobalParams) GetProject(w http.ResponseWriter, r *http.Request) {
 // @license.url   http://www.apache.org/licenses/LICENSE-2.0.html
 
 // @host      localhost:8081
-// @BasePath  /project/update
+// @BasePath  /project/{id}
 
 // @securityDefinitions.basic  BasicAuth
 
@@ -151,7 +151,7 @@ func (g *GlobalParams) UpdateProject(w http.ResponseWriter, r *http.Request) {
 // @license.url   http://www.apache.org/licenses/LICENSE-2.0.html
 
 // @host      localhost:8081
-// @BasePath  /project/delete
+// @BasePath  /project/{id}
 
 // @securityDefinitions.basic  BasicAuth
 
