@@ -1,6 +1,6 @@
 SWAG ?= swag
 
-.PHONY: docs main compose
+.PHONY: docs main
 
 docs:
 	$(SWAG) init -g inputs/api/main.go -o docs || \
@@ -9,7 +9,4 @@ docs:
 main:
 	go run cmd/api/main.go
 
-compose:
-	docker compose up -d
-
-dev: compose docs api 
+dev: docs api 
