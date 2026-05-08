@@ -31,16 +31,33 @@ func ProjectHandler(logger *slog.Logger, db *gorm.DB) *GlobalParams {
 // @securityDefinitions.basic  BasicAuth
 
 func (g *GlobalParams) CreateProject(w http.ResponseWriter, r *http.Request) {
-	var reqproject models.Project
-	if err := json.NewDecoder(r.Body).Decode(&reqproject); err != nil {
-		utils.RespondError(w, http.StatusBadRequest, "JSON inválido", err)
+	proponentID, ok := r.Context().Value("proponent_id").(uint)
+	if !ok {
+		utils.RespondError(w, http.StatusUnauthorized, "Unauthorized", nil)
 		return
 	}
-	res := g.db.Create(reqproject)
+
+	var reqProject models.Project
+	if err := json.NewDecoder(r.Body).Decode(&reqProject); err != nil {
+		utils.RespondError(w, http.StatusBadRequest, "Invalid JSON", err)
+		return
+	}
+
+	var count int64
+	g.db.Model(&models.Project{}).Where("proponent_id = ?", proponentID).Count(&count)
+	if count > 0 {
+		utils.RespondError(w, http.StatusConflict, "Proponent already has a project", nil)
+		return
+	}
+
+	reqProject.ProponentID = proponentID
+
+	res := g.db.Create(reqProject)
 	if res.Error != nil {
-		utils.RespondError(w, http.StatusBadRequest, "Erro ao criar o projecte", res.Error)
+		utils.RespondError(w, http.StatusBadRequest, "Error creating the project", res.Error)
 		return
 	}
+
 	utils.RespondJSON(w, http.StatusAccepted, true)
 }
 
@@ -60,18 +77,18 @@ func (g *GlobalParams) CreateProject(w http.ResponseWriter, r *http.Request) {
 func (g *GlobalParams) GetProject(w http.ResponseWriter, r *http.Request) {
 	id := chi.URLParam(r, "id") // or mux.Vars(r)["id"] if using gorilla/mux
 	if id == "" {
-		utils.RespondError(w, http.StatusBadRequest, "ID não informado", nil)
+		utils.RespondError(w, http.StatusBadRequest, "ProjectID not recieved", nil)
 		return
 	}
 
-	var project models.Proponent
+	var project models.Project
 	res := g.db.First(&project, "id = ?", id)
 	if res.Error != nil {
 		if errors.Is(res.Error, gorm.ErrRecordNotFound) {
-			utils.RespondError(w, http.StatusNotFound, "projecte não encontrado", res.Error)
+			utils.RespondError(w, http.StatusNotFound, "Project not found", res.Error)
 			return
 		}
-		utils.RespondError(w, http.StatusInternalServerError, "Erro ao buscar o projecte", res.Error)
+		utils.RespondError(w, http.StatusInternalServerError, "Error retrieving the Project", res.Error)
 		return
 	}
 
@@ -94,7 +111,7 @@ func (g *GlobalParams) GetProject(w http.ResponseWriter, r *http.Request) {
 func (g *GlobalParams) UpdateProject(w http.ResponseWriter, r *http.Request) {
 	id := chi.URLParam(r, "id")
 	if id == "" {
-		utils.RespondError(w, http.StatusBadRequest, "ID não informado", nil)
+		utils.RespondError(w, http.StatusBadRequest, "ProjectID not recieved", nil)
 		return
 	}
 
@@ -109,20 +126,20 @@ func (g *GlobalParams) UpdateProject(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	var reqproject models.Proponent
-	if err := json.NewDecoder(r.Body).Decode(&reqproject); err != nil {
+	var reqProject models.Project
+	if err := json.NewDecoder(r.Body).Decode(&reqProject); err != nil {
 		utils.RespondError(w, http.StatusBadRequest, "JSON inválido", err)
 		return
 	}
 
-	reqproject.ID = existing.ID
-	res = g.db.Save(&reqproject)
+	reqProject.ID = existing.ID
+	res = g.db.Model(&existing).Updates(&reqProject)
 	if res.Error != nil {
 		utils.RespondError(w, http.StatusInternalServerError, "Erro ao atualizar o projecte", res.Error)
 		return
 	}
 
-	utils.RespondJSON(w, http.StatusOK, reqproject)
+	utils.RespondJSON(w, http.StatusOK, reqProject)
 }
 
 // @title           Update project

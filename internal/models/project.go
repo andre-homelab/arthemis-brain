@@ -8,6 +8,7 @@ import (
 
 type Project struct {
 	gorm.Model
+	ProponentID   uint      `gorm:"uniqueIndex"`
 	Name          string    `gorm:"type:varchar(150);not null"`
 	LifetimeStart time.Time `gorm:"type:date"`
 	LifetimeEnd   time.Time `gorm:"type:date"`

@@ -2,15 +2,17 @@ package database
 
 import (
 	"fmt"
+	"log/slog"
 	"time"
 
 	"arthemis-brain/internal/env"
+	"arthemis-brain/internal/models"
 
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 )
 
-func ConnectToDatabase() (*gorm.DB, error) {
+func ConnectToDatabase(logger *slog.Logger) (*gorm.DB, error) {
 	host := env.GetEnv("DB_HOST", "arthemis-brain-postgres")
 	port := env.GetEnv("DB_PORT", "5432")
 	user := env.GetEnv("DB_USER", "app_user")
@@ -42,6 +44,15 @@ func ConnectToDatabase() (*gorm.DB, error) {
 	sqlDB.SetMaxOpenConns(25)
 	sqlDB.SetMaxIdleConns(10)
 	sqlDB.SetConnMaxIdleTime(30 * time.Minute)
+
+	if err := db.AutoMigrate(&models.Proponent{}); err != nil {
+		logger.Error("Error on AutoMigrate: Proponent")
+		return nil, err
+	}
+	if err := db.AutoMigrate(&models.Project{}); err != nil {
+		logger.Error("Error on AutoMigrate: Project")
+		return nil, err
+	}
 
 	return db, nil
 }

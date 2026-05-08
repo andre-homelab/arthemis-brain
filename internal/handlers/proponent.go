@@ -36,7 +36,7 @@ func (g *GlobalParams) CreateProponent(w http.ResponseWriter, r *http.Request) {
 		utils.RespondError(w, http.StatusBadRequest, "JSON inválido", err)
 		return
 	}
-	res := g.db.Create(reqProponent)
+	res := g.db.Create(&reqProponent)
 	if res.Error != nil {
 		utils.RespondError(w, http.StatusBadRequest, "Erro ao criar o proponente", res.Error)
 		return

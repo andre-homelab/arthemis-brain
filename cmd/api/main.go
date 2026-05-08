@@ -24,7 +24,7 @@ func main() {
 
 	logger := slog.New(textHandler)
 
-	db, err := database.ConnectToDatabase()
+	db, err := database.ConnectToDatabase(logger)
 	if err != nil {
 		logger.Error("Erro ao inicializar o banco!")
 		db = nil
@@ -37,7 +37,6 @@ func main() {
 	})
 
 	healthHandler := handlers.HealthHandler(logger, db)
-
 	r.Get("/health", healthHandler.HealthCheck)
 
 	proponentHandler := handlers.ProponentHandler(logger, db)
