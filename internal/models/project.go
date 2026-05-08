@@ -8,8 +8,8 @@ import (
 
 type Project struct {
 	gorm.Model
-	name          string    `gorm:"type:varchar(150);not null"`
-	lifetimeStart time.Time `gorm:"type:date"`
-	lifetimeEnd   time.Time `gorm:"type:date"`
-	justification string    `gorm:"type:text"`
+	Name          string    `gorm:"type:varchar(150);not null"`
+	LifetimeStart time.Time `gorm:"type:date"`
+	LifetimeEnd   time.Time `gorm:"type:date"`
+	Justification string    `gorm:"type:text"`
 }
