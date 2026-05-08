@@ -2,18 +2,20 @@ package handlers
 
 import (
 	"encoding/json"
+	"log/slog"
 	"net/http"
 	"time"
 
 	"gorm.io/gorm"
 )
 
-type DBStore struct {
-	db *gorm.DB
+type GlobalParams struct {
+	logger *slog.Logger
+	db     *gorm.DB
 }
 
-func HealthHandler(db *gorm.DB) *DBStore {
-	return &DBStore{db}
+func HealthHandler(logger *slog.Logger, db *gorm.DB) *GlobalParams {
+	return &GlobalParams{logger, db}
 }
 
 // @title           Health Cheack
@@ -29,19 +31,21 @@ func HealthHandler(db *gorm.DB) *DBStore {
 
 // @securityDefinitions.basic  BasicAuth
 
-func (db *DBStore) HealthCheck(w http.ResponseWriter, r *http.Request) {
+func (g *GlobalParams) HealthCheck(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("content-type", "application/json")
 	w.WriteHeader(http.StatusOK)
 
 	dbIsUp := "available"
 
-	if db == nil {
+	if g.db == nil {
 		dbIsUp = "unavailable"
 	}
 
-	json.NewEncoder(w).Encode(map[string]string{
+	if err := json.NewEncoder(w).Encode(map[string]string{
 		"status": "ok",
 		"db":     dbIsUp,
 		"time":   time.Now().UTC().Format(time.RFC3339),
-	})
+	}); err != nil {
+		g.logger.Error("Erro na resposta do health!")
+	}
 }
