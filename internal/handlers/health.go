@@ -46,6 +46,6 @@ func (g *GlobalParams) HealthCheck(w http.ResponseWriter, r *http.Request) {
 		"db":     dbIsUp,
 		"time":   time.Now().UTC().Format(time.RFC3339),
 	}); err != nil {
-		g.logger.Error("Erro na resposta do health!")
+		g.logger.Error("Error in the health response: ", "error", err)
 	}
 }
