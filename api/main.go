@@ -7,7 +7,6 @@ import (
 
 	"arthemis-brain/internal/database"
 	"arthemis-brain/internal/handlers"
-	ownMiddleware "arthemis-brain/internal/middlewares"
 
 	"github.com/go-chi/chi/v5"
 	chiMiddleware "github.com/go-chi/chi/v5/middleware"
@@ -16,7 +15,7 @@ import (
 func main() {
 	r := chi.NewRouter()
 	r.Use(chiMiddleware.Logger)
-	r.Use(ownMiddleware.PermissionMiddleware)
+	// r.Use(ownMiddleware.PermissionMiddleware)
 
 	textHandler := slog.NewTextHandler(os.Stdout, &slog.HandlerOptions{
 		Level: slog.LevelDebug,
@@ -40,8 +39,9 @@ func main() {
 
 	proponentHandler := handlers.ProponentHandler(logger, db)
 	r.Route("/proponent", func(r chi.Router) {
-		r.Post("/{id}", proponentHandler.CreateProponent)
+		r.Post("/", proponentHandler.CreateProponent)
 		r.Get("/{id}", proponentHandler.GetProponent)
+		r.Get("/", proponentHandler.GetAllProponents)
 		r.Patch("/{id}", proponentHandler.UpdateProponent)
 		r.Delete("/{id}", proponentHandler.DeleteProponent)
 	})
