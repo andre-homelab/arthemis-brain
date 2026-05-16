@@ -26,17 +26,11 @@ func ProjectHandler(logger *slog.Logger, db *gorm.DB) *GlobalParams {
 // @license.url   http://www.apache.org/licenses/LICENSE-2.0.html
 
 // @host      localhost:8081
-// @BasePath  /project/{id}
+// @BasePath  /project/create
 
 // @securityDefinitions.basic  BasicAuth
 
 func (g *GlobalParams) CreateProject(w http.ResponseWriter, r *http.Request) {
-	proponentID, ok := r.Context().Value("proponent_id").(uint)
-	if !ok {
-		utils.RespondError(w, http.StatusUnauthorized, "Unauthorized", nil)
-		return
-	}
-
 	var reqProject models.Project
 	if err := json.NewDecoder(r.Body).Decode(&reqProject); err != nil {
 		utils.RespondError(w, http.StatusBadRequest, "Invalid JSON", err)
@@ -44,15 +38,13 @@ func (g *GlobalParams) CreateProject(w http.ResponseWriter, r *http.Request) {
 	}
 
 	var count int64
-	g.db.Model(&models.Project{}).Where("proponent_id = ?", proponentID).Count(&count)
+	g.db.Model(&models.Project{}).Where("proponent_id = ?", reqProject.ProponentID).Count(&count)
 	if count > 0 {
 		utils.RespondError(w, http.StatusConflict, "Proponent already has a project", nil)
 		return
 	}
 
-	reqProject.ProponentID = proponentID
-
-	res := g.db.Create(reqProject)
+	res := g.db.Create(&reqProject)
 	if res.Error != nil {
 		utils.RespondError(w, http.StatusBadRequest, "Error creating the project", res.Error)
 		return
@@ -104,7 +96,7 @@ func (g *GlobalParams) GetProject(w http.ResponseWriter, r *http.Request) {
 // @license.url   http://www.apache.org/licenses/LICENSE-2.0.html
 
 // @host      localhost:8081
-// @BasePath  /project/{id}
+// @BasePath  /project/update/{id}
 
 // @securityDefinitions.basic  BasicAuth
 
@@ -142,7 +134,7 @@ func (g *GlobalParams) UpdateProject(w http.ResponseWriter, r *http.Request) {
 	utils.RespondJSON(w, http.StatusOK, reqProject)
 }
 
-// @title           Update project
+// @title           Delete project
 // @version         1.0
 // @description     Deletes a project
 // @termsOfService  http://swagger.io/terms/
@@ -151,7 +143,7 @@ func (g *GlobalParams) UpdateProject(w http.ResponseWriter, r *http.Request) {
 // @license.url   http://www.apache.org/licenses/LICENSE-2.0.html
 
 // @host      localhost:8081
-// @BasePath  /project/{id}
+// @BasePath  /project/delete/{id}
 
 // @securityDefinitions.basic  BasicAuth
 

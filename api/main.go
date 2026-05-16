@@ -39,19 +39,19 @@ func main() {
 
 	proponentHandler := handlers.ProponentHandler(logger, db)
 	r.Route("/proponent", func(r chi.Router) {
-		r.Post("/", proponentHandler.CreateProponent)
+		r.Post("/create", proponentHandler.CreateProponent)
 		r.Get("/{id}", proponentHandler.GetProponent)
 		r.Get("/", proponentHandler.GetAllProponents)
-		r.Patch("/{id}", proponentHandler.UpdateProponent)
-		r.Delete("/{id}", proponentHandler.DeleteProponent)
+		r.Patch("/update/{id}", proponentHandler.UpdateProponent)
+		r.Delete("/delete/{id}", proponentHandler.DeleteProponent)
 	})
 
 	projectHandler := handlers.ProjectHandler(logger, db)
 	r.Route("/project", func(r chi.Router) {
-		r.Post("/{id}", projectHandler.CreateProject)
+		r.Post("/create", projectHandler.CreateProject)
 		r.Get("/{id}", projectHandler.GetProject)
-		r.Put("/{id}", projectHandler.UpdateProject)
-		r.Delete("/{id}", projectHandler.DeleteProject)
+		r.Put("/update/{id}", projectHandler.UpdateProject)
+		r.Delete("/delete/{id}", projectHandler.DeleteProject)
 	})
 
 	logger.Info("Server started!")
