@@ -17,7 +17,9 @@ services:
       postgres:
         condition: service_healthy
     networks:
-      - arthemis-edge
+      arthemis-edge:
+        aliases:
+          - brain
   postgres:
     image: postgres:16
     container_name: arthemis-brain-postgres
