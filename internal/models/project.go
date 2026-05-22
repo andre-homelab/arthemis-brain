@@ -13,4 +13,6 @@ type Project struct {
 	LifetimeStart time.Time `gorm:"type:date"`
 	LifetimeEnd   time.Time `gorm:"type:date"`
 	Justification string    `gorm:"type:text"`
+	Locations     []Location
+	Activities    []Activity
 }

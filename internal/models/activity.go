@@ -10,4 +10,5 @@ type Activity struct {
 	Name          string `gorm:"type:varchar(100)"`
 	Description   string `gorm:"type:text"`
 	Justification string `gorm:"type:text"`
+	Indicators    []Indicator
 }

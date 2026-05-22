@@ -54,6 +54,14 @@ func main() {
 		r.Delete("/delete/{id}", projectHandler.DeleteProject)
 	})
 
+	activityHandler := handlers.ActivityHandler(logger, db)
+	r.Route("/activity", func(r chi.Router) {
+		r.Post("/create", activityHandler.CreateProject)
+		r.Get("/{id}", activityHandler.GetProject)
+		r.Put("/update/{id}", activityHandler.UpdateProject)
+		r.Delete("/delete/{id}", activityHandler.DeleteProject)
+	})
+
 	logger.Info("Server started!")
 	logger.Info("http://localhost:8081")
 
