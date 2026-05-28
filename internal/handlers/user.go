@@ -101,7 +101,7 @@ func (g *GlobalParams) CreateUser(w http.ResponseWriter, r *http.Request) {
 		Email:       req.Email,
 		// O brain mantém apenas o perfil do usuário; hashes de senha ficam no auth.
 		Password: "",
-		Role:         req.Role,
+		Role:     req.Role,
 	}
 
 	res := g.db.Create(&reqUser)
