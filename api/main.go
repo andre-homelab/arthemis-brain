@@ -56,10 +56,18 @@ func main() {
 
 	activityHandler := handlers.ActivityHandler(logger, db)
 	r.Route("/activity", func(r chi.Router) {
-		r.Post("/create", activityHandler.CreateProject)
-		r.Get("/{id}", activityHandler.GetProject)
-		r.Put("/update/{id}", activityHandler.UpdateProject)
-		r.Delete("/delete/{id}", activityHandler.DeleteProject)
+		r.Post("/create", activityHandler.CreateActivity)
+		r.Get("/{id}", activityHandler.GetActivity)
+		r.Put("/update/{id}", activityHandler.UpdateActivity)
+		r.Delete("/delete/{id}", activityHandler.DeleteActivity)
+	})
+
+	locationHandler := handlers.LocationHandler(logger, db)
+	r.Route("/location", func(r chi.Router) {
+		r.Post("/create", locationHandler.CreateLocation)
+		r.Get("/{id}", locationHandler.GetLocation)
+		r.Put("/update/{id}", locationHandler.UpdateLocation)
+		r.Delete("/delete/{id}", locationHandler.DeleteLocation)
 	})
 
 	logger.Info("Server started!")

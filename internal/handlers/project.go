@@ -37,13 +37,6 @@ func (g *GlobalParams) CreateProject(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	var count int64
-	g.db.Model(&models.Project{}).Where("proponent_id = ?", reqProject.ProponentID).Count(&count)
-	if count > 0 {
-		utils.RespondError(w, http.StatusConflict, "Proponent already has a project", nil)
-		return
-	}
-
 	res := g.db.Create(&reqProject)
 	if res.Error != nil {
 		utils.RespondError(w, http.StatusBadRequest, "Error creating the project", res.Error)

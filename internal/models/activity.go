@@ -6,7 +6,7 @@ import (
 
 type Activity struct {
 	gorm.Model
-	ProjectID     uint   `gorm:"uniqueIndex"`
+	ProjectID     uint
 	Name          string `gorm:"type:varchar(100)"`
 	Description   string `gorm:"type:text"`
 	Justification string `gorm:"type:text"`

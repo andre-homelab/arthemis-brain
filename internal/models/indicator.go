@@ -6,8 +6,8 @@ import (
 
 type Indicator struct {
 	gorm.Model
-	ActivityID        uint    `gorm:"uniqueIndex"`
-	LocationID        uint    `gorm:"uniqueIndex"`
+	ActivityID        uint
+	LocationID        uint
 	Name              string  `gorm:"type:varchar(100)"`
 	Unit              string  `gorm:"type:varchar(50)"`
 	ValueBaseline     float32 `gorm:"type:decimal"`
