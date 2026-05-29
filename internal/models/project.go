@@ -8,11 +8,12 @@ import (
 
 type Project struct {
 	gorm.Model
-	ProponentID   uint
-	Name          string    `gorm:"type:varchar(150);not null"`
-	LifetimeStart time.Time `gorm:"type:date"`
-	LifetimeEnd   time.Time `gorm:"type:date"`
-	Justification string    `gorm:"type:text"`
-	Locations     []Location
-	Activities    []Activity
+	ProponentID       uint
+	Name              string    `gorm:"type:varchar(150);not null"`
+	LifetimeStart     time.Time `gorm:"type:date"`
+	LifetimeEnd       time.Time `gorm:"type:date"`
+	Justification     string    `gorm:"type:text"`
+	Locations         []Location
+	Activities        []Activity
+	ProjectProponents []Proponent `gorm:"many2many:project_proponent"`
 }

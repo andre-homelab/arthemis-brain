@@ -52,6 +52,8 @@ func main() {
 		r.Get("/{id}", projectHandler.GetProject)
 		r.Put("/update/{id}", projectHandler.UpdateProject)
 		r.Delete("/delete/{id}", projectHandler.DeleteProject)
+		r.Post("/{id}/add_proponent", projectHandler.AddProponent)
+		r.Delete("/{projectId}/remove_proponent/{proponentId}", projectHandler.RemoveProponent)
 	})
 
 	activityHandler := handlers.ActivityHandler(logger, db)
@@ -68,6 +70,14 @@ func main() {
 		r.Get("/{id}", locationHandler.GetLocation)
 		r.Put("/update/{id}", locationHandler.UpdateLocation)
 		r.Delete("/delete/{id}", locationHandler.DeleteLocation)
+	})
+
+	indicatorHandler := handlers.IndicatorHandler(logger, db)
+	r.Route("/indicator", func(r chi.Router) {
+		r.Post("/create", indicatorHandler.CreateIndicator)
+		r.Get("/{id}", indicatorHandler.GetIndicator)
+		r.Put("/update/{id}", indicatorHandler.UpdateIndicator)
+		r.Delete("/delete/{id}", indicatorHandler.DeleteIndicator)
 	})
 
 	logger.Info("Server started!")

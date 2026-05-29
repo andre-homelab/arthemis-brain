@@ -185,19 +185,3 @@ func (g *GlobalParams) GetAllProponents(w http.ResponseWriter, r *http.Request) 
 
 	utils.RespondJSON(w, http.StatusOK, proponents)
 }
-
-// @title           Add Proponent To Project
-// @version         1.0
-// @description     Creates association between proponent and project on project_proponent table
-// @termsOfService  http://swagger.io/terms/
-
-// @license.name  Apache 2.0
-// @license.url   http://www.apache.org/licenses/LICENSE-2.0.html
-
-// @host      localhost:8081
-// @BasePath  /proponent/addproject
-
-// @securityDefinitions.basic  BasicAuth
-
-func (g *GlobalParams) AddProponentToProject(w http.ResponseWriter, r *http.Request) {
-}
