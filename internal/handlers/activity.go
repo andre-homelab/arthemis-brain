@@ -43,7 +43,7 @@ func (g *GlobalParams) CreateActivity(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	utils.RespondJSON(w, http.StatusAccepted, reqActivity)
+	utils.RespondJSON(w, http.StatusAccepted, reqActivity.ID)
 }
 
 // @title           Get activity

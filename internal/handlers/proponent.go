@@ -41,7 +41,7 @@ func (g *GlobalParams) CreateProponent(w http.ResponseWriter, r *http.Request) {
 		utils.RespondError(w, http.StatusBadRequest, "Erro ao criar o proponente", res.Error)
 		return
 	}
-	utils.RespondJSON(w, http.StatusAccepted, reqProponent)
+	utils.RespondJSON(w, http.StatusAccepted, reqProponent.ID)
 }
 
 // @title           Get Proponent

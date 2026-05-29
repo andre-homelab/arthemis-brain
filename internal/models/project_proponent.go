@@ -2,7 +2,7 @@ package models
 
 import "gorm.io/gorm"
 
-type PersonAddress struct {
+type ProjectProponent struct {
 	gorm.Model
 	ProponentID Proponent
 	ProjectID   Project
