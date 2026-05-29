@@ -57,7 +57,6 @@ func ConnectToDatabase(logger *slog.Logger) (*gorm.DB, error) {
 		logger.Error("Error on AutoMigrate: ProjectProponent")
 		return nil, err
 	}
-
 	if err := db.AutoMigrate(&models.Activity{}); err != nil {
 		logger.Error("Error on AutoMigrate: Activity")
 		return nil, err

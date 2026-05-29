@@ -67,7 +67,7 @@ func (g *GlobalParams) GetProject(w http.ResponseWriter, r *http.Request) {
 	}
 
 	var project models.Project
-	res := g.db.Preload("Locations").Preload("Activities").First(&project, "id = ?", id)
+	res := g.db.Preload("Locations").Preload("Activities").Preload("ProjectProponents").First(&project, "id = ?", id)
 	if res.Error != nil {
 		if errors.Is(res.Error, gorm.ErrRecordNotFound) {
 			utils.RespondError(w, http.StatusNotFound, "Project not found", res.Error)
@@ -230,13 +230,14 @@ func (g *GlobalParams) RemoveProponent(w http.ResponseWriter, r *http.Request) {
 	g.db.First(&project, "id = ?", projectID)
 
 	proponentID := chi.URLParam(r, "proponentId")
-	if projectID == "" {
+	if proponentID == "" {
 		utils.RespondError(w, http.StatusBadRequest, "ID do projeto não informado", nil)
 		return
 	}
 
-	if err := g.db.Delete(proponentID).Error; err != nil {
-		utils.RespondError(w, http.StatusInternalServerError, "Failed to add proponent", err)
+	if err := g.db.Where("project_id = ? AND proponent_id = ?", projectID, proponentID).
+		Delete(&models.ProjectProponent{}).Error; err != nil {
+		utils.RespondError(w, http.StatusInternalServerError, "Failed to remove proponent", err)
 		return
 	}
 

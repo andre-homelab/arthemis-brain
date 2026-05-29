@@ -15,5 +15,5 @@ type Project struct {
 	Justification     string    `gorm:"type:text"`
 	Locations         []Location
 	Activities        []Activity
-	ProjectProponents []Proponent `gorm:"many2many:project_proponent"`
+	ProjectProponents []ProjectProponent
 }

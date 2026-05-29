@@ -65,7 +65,7 @@ func (g *GlobalParams) GetProponent(w http.ResponseWriter, r *http.Request) {
 	}
 
 	var proponent models.Proponent
-	res := g.db.Preload("Projects").Preload("ProjectProponents").First(&proponent, "id = ?", id)
+	res := g.db.Preload("Projects").First(&proponent, "id = ?", id)
 	if res.Error != nil {
 		if errors.Is(res.Error, gorm.ErrRecordNotFound) {
 			utils.RespondError(w, http.StatusNotFound, "Proponent not found", res.Error)
@@ -173,7 +173,7 @@ func (g *GlobalParams) DeleteProponent(w http.ResponseWriter, r *http.Request) {
 
 func (g *GlobalParams) GetAllProponents(w http.ResponseWriter, r *http.Request) {
 	var proponents []models.Proponent
-	res := g.db.Preload("Projects").Preload("ProjectProponents").Find(&proponents)
+	res := g.db.Preload("Projects").Find(&proponents)
 	if res.Error != nil {
 		if errors.Is(res.Error, gorm.ErrRecordNotFound) {
 			utils.RespondError(w, http.StatusNotFound, "Proponent not found", res.Error)
