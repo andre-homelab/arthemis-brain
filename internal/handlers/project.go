@@ -43,7 +43,7 @@ func (g *GlobalParams) CreateProject(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	utils.RespondJSON(w, http.StatusAccepted, true)
+	utils.RespondJSON(w, http.StatusAccepted, &reqProject)
 }
 
 // @title           Get project

@@ -41,7 +41,7 @@ func (g *GlobalParams) CreateProponent(w http.ResponseWriter, r *http.Request) {
 		utils.RespondError(w, http.StatusBadRequest, "Erro ao criar o proponente", res.Error)
 		return
 	}
-	utils.RespondJSON(w, http.StatusAccepted, true)
+	utils.RespondJSON(w, http.StatusAccepted, reqProponent)
 }
 
 // @title           Get Proponent
@@ -65,7 +65,7 @@ func (g *GlobalParams) GetProponent(w http.ResponseWriter, r *http.Request) {
 	}
 
 	var proponent models.Proponent
-	res := g.db.Preload("Project").First(&proponent, "id = ?", id)
+	res := g.db.Preload("Projects").Preload("ProjectProponents").First(&proponent, "id = ?", id)
 	if res.Error != nil {
 		if errors.Is(res.Error, gorm.ErrRecordNotFound) {
 			utils.RespondError(w, http.StatusNotFound, "Proponent not found", res.Error)
@@ -160,7 +160,7 @@ func (g *GlobalParams) DeleteProponent(w http.ResponseWriter, r *http.Request) {
 
 // @title           Get All Proponent
 // @version         1.0
-// @description     Reads a proponent
+// @description     Returns all proponents
 // @termsOfService  http://swagger.io/terms/
 
 // @license.name  Apache 2.0
@@ -173,7 +173,7 @@ func (g *GlobalParams) DeleteProponent(w http.ResponseWriter, r *http.Request) {
 
 func (g *GlobalParams) GetAllProponents(w http.ResponseWriter, r *http.Request) {
 	var proponents []models.Proponent
-	res := g.db.Preload("Project").Find(&proponents)
+	res := g.db.Preload("Projects").Preload("ProjectProponents").Find(&proponents)
 	if res.Error != nil {
 		if errors.Is(res.Error, gorm.ErrRecordNotFound) {
 			utils.RespondError(w, http.StatusNotFound, "Proponent not found", res.Error)
@@ -184,4 +184,20 @@ func (g *GlobalParams) GetAllProponents(w http.ResponseWriter, r *http.Request) 
 	}
 
 	utils.RespondJSON(w, http.StatusOK, proponents)
+}
+
+// @title           Add Proponent To Project
+// @version         1.0
+// @description     Creates association between proponent and project on project_proponent table
+// @termsOfService  http://swagger.io/terms/
+
+// @license.name  Apache 2.0
+// @license.url   http://www.apache.org/licenses/LICENSE-2.0.html
+
+// @host      localhost:8081
+// @BasePath  /proponent/addproject
+
+// @securityDefinitions.basic  BasicAuth
+
+func (g *GlobalParams) AddProponentToProject(w http.ResponseWriter, r *http.Request) {
 }

@@ -43,7 +43,7 @@ func (g *GlobalParams) CreateLocation(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	utils.RespondJSON(w, http.StatusAccepted, true)
+	utils.RespondJSON(w, http.StatusAccepted, reqLocation)
 }
 
 // @title           Get location
