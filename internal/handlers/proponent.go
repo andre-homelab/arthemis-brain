@@ -26,7 +26,7 @@ func ProponentHandler(logger *slog.Logger, db *gorm.DB) *GlobalParams {
 // @license.url   http://www.apache.org/licenses/LICENSE-2.0.html
 
 // @host      localhost:8081
-// @BasePath  /proponent/{id}
+// @BasePath  /proponent/create
 
 // @securityDefinitions.basic  BasicAuth
 
@@ -65,7 +65,7 @@ func (g *GlobalParams) GetProponent(w http.ResponseWriter, r *http.Request) {
 	}
 
 	var proponent models.Proponent
-	res := g.db.First(&proponent, "id = ?", id)
+	res := g.db.Preload("Project").First(&proponent, "id = ?", id)
 	if res.Error != nil {
 		if errors.Is(res.Error, gorm.ErrRecordNotFound) {
 			utils.RespondError(w, http.StatusNotFound, "Proponent not found", res.Error)
@@ -87,7 +87,7 @@ func (g *GlobalParams) GetProponent(w http.ResponseWriter, r *http.Request) {
 // @license.url   http://www.apache.org/licenses/LICENSE-2.0.html
 
 // @host      localhost:8081
-// @BasePath  /proponent/{id}
+// @BasePath  /proponent/update/{id}
 
 // @securityDefinitions.basic  BasicAuth
 
@@ -125,7 +125,7 @@ func (g *GlobalParams) UpdateProponent(w http.ResponseWriter, r *http.Request) {
 	utils.RespondJSON(w, http.StatusOK, reqProponent)
 }
 
-// @title           Update Proponent
+// @title           Delete Proponent
 // @version         1.0
 // @description     Deletes a proponent
 // @termsOfService  http://swagger.io/terms/
@@ -134,7 +134,7 @@ func (g *GlobalParams) UpdateProponent(w http.ResponseWriter, r *http.Request) {
 // @license.url   http://www.apache.org/licenses/LICENSE-2.0.html
 
 // @host      localhost:8081
-// @BasePath  /proponent/{id}
+// @BasePath  /proponent/delete/{id}
 
 // @securityDefinitions.basic  BasicAuth
 
@@ -156,4 +156,32 @@ func (g *GlobalParams) DeleteProponent(w http.ResponseWriter, r *http.Request) {
 	}
 
 	utils.RespondJSON(w, http.StatusOK, true)
+}
+
+// @title           Get All Proponent
+// @version         1.0
+// @description     Reads a proponent
+// @termsOfService  http://swagger.io/terms/
+
+// @license.name  Apache 2.0
+// @license.url   http://www.apache.org/licenses/LICENSE-2.0.html
+
+// @host      localhost:8081
+// @BasePath  /proponent/
+
+// @securityDefinitions.basic  BasicAuth
+
+func (g *GlobalParams) GetAllProponents(w http.ResponseWriter, r *http.Request) {
+	var proponents []models.Proponent
+	res := g.db.Preload("Project").Find(&proponents)
+	if res.Error != nil {
+		if errors.Is(res.Error, gorm.ErrRecordNotFound) {
+			utils.RespondError(w, http.StatusNotFound, "Proponent not found", res.Error)
+			return
+		}
+		utils.RespondError(w, http.StatusInternalServerError, "Error finding proponent", res.Error)
+		return
+	}
+
+	utils.RespondJSON(w, http.StatusOK, proponents)
 }

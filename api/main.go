@@ -7,7 +7,6 @@ import (
 
 	"arthemis-brain/internal/database"
 	"arthemis-brain/internal/handlers"
-	ownMiddleware "arthemis-brain/internal/middlewares"
 
 	"github.com/go-chi/chi/v5"
 	chiMiddleware "github.com/go-chi/chi/v5/middleware"
@@ -16,7 +15,7 @@ import (
 func main() {
 	r := chi.NewRouter()
 	r.Use(chiMiddleware.Logger)
-	r.Use(ownMiddleware.PermissionMiddleware)
+	// r.Use(ownMiddleware.PermissionMiddleware)
 
 	textHandler := slog.NewTextHandler(os.Stdout, &slog.HandlerOptions{
 		Level: slog.LevelDebug,
@@ -40,18 +39,28 @@ func main() {
 
 	proponentHandler := handlers.ProponentHandler(logger, db)
 	r.Route("/proponent", func(r chi.Router) {
-		r.Post("/{id}", proponentHandler.CreateProponent)
+		r.Post("/create", proponentHandler.CreateProponent)
 		r.Get("/{id}", proponentHandler.GetProponent)
-		r.Patch("/{id}", proponentHandler.UpdateProponent)
-		r.Delete("/{id}", proponentHandler.DeleteProponent)
+		r.Get("/", proponentHandler.GetAllProponents)
+		r.Patch("/update/{id}", proponentHandler.UpdateProponent)
+		r.Delete("/delete/{id}", proponentHandler.DeleteProponent)
 	})
 
 	projectHandler := handlers.ProjectHandler(logger, db)
 	r.Route("/project", func(r chi.Router) {
-		r.Post("/{id}", projectHandler.CreateProject)
+		r.Post("/create", projectHandler.CreateProject)
 		r.Get("/{id}", projectHandler.GetProject)
-		r.Put("/{id}", projectHandler.UpdateProject)
-		r.Delete("/{id}", projectHandler.DeleteProject)
+		r.Put("/update/{id}", projectHandler.UpdateProject)
+		r.Delete("/delete/{id}", projectHandler.DeleteProject)
+	})
+
+	userHandler := handlers.UserHandler(logger, db)
+	r.Route("/user", func(r chi.Router) {
+		r.Post("/create", userHandler.CreateUser)
+		r.Get("/{id}", userHandler.GetUser)
+		r.Get("/", userHandler.GetAllUsers)
+		r.Patch("/update/{id}", userHandler.UpdateUser)
+		r.Delete("/delete/{id}", userHandler.DeleteUser)
 	})
 
 	logger.Info("Server started!")
