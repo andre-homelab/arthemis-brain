@@ -30,12 +30,6 @@ func ProjectHandler(logger *slog.Logger, db *gorm.DB) *GlobalParams {
 // @Failure      409      {object}  utils.ErrorResponse "Proponent already has a project"
 // @Router       /project/{id} [post]
 func (g *GlobalParams) CreateProject(w http.ResponseWriter, r *http.Request) {
-	proponentID, ok := r.Context().Value("proponent_id").(uint)
-	if !ok {
-		utils.RespondError(w, http.StatusUnauthorized, "Unauthorized", nil)
-		return
-	}
-
 	var reqProject models.Project
 	if err := json.NewDecoder(r.Body).Decode(&reqProject); err != nil {
 		utils.RespondError(w, http.StatusBadRequest, "Invalid JSON", err)
@@ -43,15 +37,13 @@ func (g *GlobalParams) CreateProject(w http.ResponseWriter, r *http.Request) {
 	}
 
 	var count int64
-	g.db.Model(&models.Project{}).Where("proponent_id = ?", proponentID).Count(&count)
+	g.db.Model(&models.Project{}).Where("proponent_id = ?", reqProject.ProponentID).Count(&count)
 	if count > 0 {
 		utils.RespondError(w, http.StatusConflict, "Proponent already has a project", nil)
 		return
 	}
 
-	reqProject.ProponentID = proponentID
-
-	res := g.db.Create(reqProject)
+	res := g.db.Create(&reqProject)
 	if res.Error != nil {
 		utils.RespondError(w, http.StatusBadRequest, "Error creating the project", res.Error)
 		return
