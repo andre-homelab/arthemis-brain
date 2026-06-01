@@ -17,19 +17,16 @@ func ProponentHandler(logger *slog.Logger, db *gorm.DB) *GlobalParams {
 	return &GlobalParams{logger, db}
 }
 
-// @title           Create Proponent
-// @version         1.0
-// @description     Creates a proponent
-// @termsOfService  http://swagger.io/terms/
-
-// @license.name  Apache 2.0
-// @license.url   http://www.apache.org/licenses/LICENSE-2.0.html
-
-// @host      localhost:8081
-// @BasePath  /proponent/{id}
-
-// @securityDefinitions.basic  BasicAuth
-
+// @Summary      Create Proponent
+// @Description  Creates a new proponent
+// @Tags         proponent
+// @Accept       json
+// @Produce      json
+// @Param        id         path      string            true   "Proponent ID"
+// @Param        proponent  body      models.Proponent  true   "Proponent details"
+// @Success      202        {boolean} true              "Proponent created successfully"
+// @Failure      400        {object}  utils.ErrorResponse "Invalid JSON or bad request"
+// @Router       /proponent/{id} [post]
 func (g *GlobalParams) CreateProponent(w http.ResponseWriter, r *http.Request) {
 	var reqProponent models.Proponent
 	if err := json.NewDecoder(r.Body).Decode(&reqProponent); err != nil {
@@ -44,19 +41,16 @@ func (g *GlobalParams) CreateProponent(w http.ResponseWriter, r *http.Request) {
 	utils.RespondJSON(w, http.StatusAccepted, true)
 }
 
-// @title           Get Proponent
-// @version         1.0
-// @description     Reads a proponent
-// @termsOfService  http://swagger.io/terms/
-
-// @license.name  Apache 2.0
-// @license.url   http://www.apache.org/licenses/LICENSE-2.0.html
-
-// @host      localhost:8081
-// @BasePath  /proponent/{id}
-
-// @securityDefinitions.basic  BasicAuth
-
+// @Summary      Get Proponent
+// @Description  Retrieves a proponent by ID
+// @Tags         proponent
+// @Produce      json
+// @Param        id   path      string  true  "Proponent ID"
+// @Success      200  {object}  models.Proponent
+// @Failure      400  {object}  utils.ErrorResponse "ProponentID not found"
+// @Failure      404  {object}  utils.ErrorResponse "Proponent not found"
+// @Failure      500  {object}  utils.ErrorResponse "Internal server error"
+// @Router       /proponent/{id} [get]
 func (g *GlobalParams) GetProponent(w http.ResponseWriter, r *http.Request) {
 	id := chi.URLParam(r, "id") // or mux.Vars(r)["id"] if using gorilla/mux
 	if id == "" {
@@ -78,19 +72,18 @@ func (g *GlobalParams) GetProponent(w http.ResponseWriter, r *http.Request) {
 	utils.RespondJSON(w, http.StatusOK, proponent)
 }
 
-// @title           Update Proponent
-// @version         1.0
-// @description     Updates a proponent
-// @termsOfService  http://swagger.io/terms/
-
-// @license.name  Apache 2.0
-// @license.url   http://www.apache.org/licenses/LICENSE-2.0.html
-
-// @host      localhost:8081
-// @BasePath  /proponent/{id}
-
-// @securityDefinitions.basic  BasicAuth
-
+// @Summary      Update Proponent
+// @Description  Updates an existing proponent by ID
+// @Tags         proponent
+// @Accept       json
+// @Produce      json
+// @Param        id         path      string            true   "Proponent ID"
+// @Param        proponent  body      models.Proponent  true   "Proponent details to update"
+// @Success      200        {object}  models.Proponent
+// @Failure      400        {object}  utils.ErrorResponse "Invalid JSON or ProponentID not found"
+// @Failure      404        {object}  utils.ErrorResponse "Proponent not found"
+// @Failure      500        {object}  utils.ErrorResponse "Internal server error"
+// @Router       /proponent/{id} [patch]
 func (g *GlobalParams) UpdateProponent(w http.ResponseWriter, r *http.Request) {
 	id := chi.URLParam(r, "id")
 	if id == "" {
@@ -125,19 +118,16 @@ func (g *GlobalParams) UpdateProponent(w http.ResponseWriter, r *http.Request) {
 	utils.RespondJSON(w, http.StatusOK, reqProponent)
 }
 
-// @title           Update Proponent
-// @version         1.0
-// @description     Deletes a proponent
-// @termsOfService  http://swagger.io/terms/
-
-// @license.name  Apache 2.0
-// @license.url   http://www.apache.org/licenses/LICENSE-2.0.html
-
-// @host      localhost:8081
-// @BasePath  /proponent/{id}
-
-// @securityDefinitions.basic  BasicAuth
-
+// @Summary      Delete Proponent
+// @Description  Deletes a proponent by ID
+// @Tags         proponent
+// @Produce      json
+// @Param        id   path      string  true  "Proponent ID"
+// @Success      200  {boolean} true    "Proponent deleted successfully"
+// @Failure      400  {object}  utils.ErrorResponse "ProponentID not found"
+// @Failure      404  {object}  utils.ErrorResponse "Proponent not found"
+// @Failure      500  {object}  utils.ErrorResponse "Internal server error"
+// @Router       /proponent/{id} [delete]
 func (g *GlobalParams) DeleteProponent(w http.ResponseWriter, r *http.Request) {
 	id := chi.URLParam(r, "id")
 	if id == "" {
