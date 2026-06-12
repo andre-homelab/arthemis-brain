@@ -107,7 +107,7 @@ func main() {
 	})
 
 	observationHandler := handlers.ObservationHandler(logger, db)
-	r.Route("/user", func(r chi.Router) {
+	r.Route("/observation", func(r chi.Router) {
 		r.Post("/create", observationHandler.CreateObservations)
 		r.Get("/{id}", observationHandler.GetObservation)
 		r.Patch("/update/{id}", observationHandler.UpdateObservation)

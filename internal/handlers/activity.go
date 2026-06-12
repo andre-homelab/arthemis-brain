@@ -17,6 +17,14 @@ func ActivityHandler(logger *slog.Logger, db *gorm.DB) *GlobalParams {
 	return &GlobalParams{logger, db}
 }
 
+type CreateActivityRequest struct {
+	ProjectID     uint   `json:"project_id"`
+	Name          string `json:"name"`
+	Description   string `json:"description"`
+	Justification string `json:"justification"`
+	LocationIDs   []uint `json:"location_ids"`
+}
+
 // @Summary      Create Activity
 // @Description  Creates an activity
 // @Tags         activity
@@ -27,25 +35,56 @@ func ActivityHandler(logger *slog.Logger, db *gorm.DB) *GlobalParams {
 // @Failure      500  {object}  utils.ErrorResponse "Internal server error"
 // @Router       /activity/create [post]
 func (g *GlobalParams) CreateActivity(w http.ResponseWriter, r *http.Request) {
-	var reqActivities []models.Activity
-	if err := json.NewDecoder(r.Body).Decode(&reqActivities); err != nil {
+	var reqs []CreateActivityRequest
+	if err := json.NewDecoder(r.Body).Decode(&reqs); err != nil {
 		utils.RespondError(w, http.StatusBadRequest, "Invalid JSON", err)
 		return
 	}
 
-	if len(reqActivities) == 0 {
+	if len(reqs) == 0 {
 		utils.RespondError(w, http.StatusBadRequest, "No activities provided", nil)
 		return
 	}
 
-	res := g.db.Create(&reqActivities)
-	if res.Error != nil {
+	// Build Activity slice and collect location IDs per activity
+	activities := make([]models.Activity, len(reqs))
+	locationIDsPerActivity := make([][]uint, len(reqs))
+	for i, req := range reqs {
+		activities[i] = models.Activity{
+			ProjectID:     req.ProjectID,
+			Name:          req.Name,
+			Description:   req.Description,
+			Justification: req.Justification,
+		}
+		locationIDsPerActivity[i] = req.LocationIDs
+	}
+
+	// Create all activities in a single query (no associations yet)
+	if res := g.db.Omit("Locations").Create(&activities); res.Error != nil {
 		utils.RespondError(w, http.StatusBadRequest, "Error creating the activities", res.Error)
 		return
 	}
 
-	ids := make([]uint, len(reqActivities))
-	for i, activity := range reqActivities {
+	// Link locations for each activity individually
+	for i, activity := range activities {
+		if len(locationIDsPerActivity[i]) == 0 {
+			continue
+		}
+
+		// Build Location stubs — GORM only needs the primary keys to form the join table rows
+		locations := make([]models.Location, len(locationIDsPerActivity[i]))
+		for j, id := range locationIDsPerActivity[i] {
+			locations[j] = models.Location{Model: gorm.Model{ID: id}}
+		}
+
+		if err := g.db.Model(&activity).Association("Locations").Replace(locations); err != nil {
+			utils.RespondError(w, http.StatusInternalServerError, "Error associating locations", err)
+			return
+		}
+	}
+
+	ids := make([]uint, len(activities))
+	for i, activity := range activities {
 		ids[i] = activity.ID
 	}
 
@@ -70,7 +109,7 @@ func (g *GlobalParams) GetActivity(w http.ResponseWriter, r *http.Request) {
 	}
 
 	var activity models.Activity
-	res := g.db.Preload("Locations").First(&activity, "id = ?", id)
+	res := g.db.Preload("Indicators").First(&activity, "id = ?", id)
 	if res.Error != nil {
 		if errors.Is(res.Error, gorm.ErrRecordNotFound) {
 			utils.RespondError(w, http.StatusNotFound, "Activity not found", res.Error)
