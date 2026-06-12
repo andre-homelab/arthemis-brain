@@ -69,8 +69,8 @@ func ConnectToDatabase(logger *slog.Logger) (*gorm.DB, error) {
 		logger.Error("Error on AutoMigrate: Indicator")
 		return nil, err
 	}
-	if err := db.AutoMigrate(&models.IndicatorObservation{}); err != nil {
-		logger.Error("Error on AutoMigrate: IndicatorObservation")
+	if err := db.AutoMigrate(&models.Observation{}); err != nil {
+		logger.Error("Error on AutoMigrate: Observation")
 		return nil, err
 	}
 	if err := db.AutoMigrate(&models.User{}); err != nil {

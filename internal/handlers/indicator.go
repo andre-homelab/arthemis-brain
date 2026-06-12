@@ -70,7 +70,7 @@ func (g *GlobalParams) GetIndicator(w http.ResponseWriter, r *http.Request) {
 	}
 
 	var indicator models.Proponent
-	res := g.db.Preload("IndicatorObservations").First(&indicator, "id = ?", id)
+	res := g.db.Preload("Observations").First(&indicator, "id = ?", id)
 	if res.Error != nil {
 		if errors.Is(res.Error, gorm.ErrRecordNotFound) {
 			utils.RespondError(w, http.StatusNotFound, "indicator not found", res.Error)

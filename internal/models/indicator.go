@@ -14,5 +14,5 @@ type Indicator struct {
 	ValueReference    float32 `gorm:"type:decimal"`
 	ObservationMethod string  `gorm:"type:text"`
 	Justification     string  `gorm:"type:text"`
-	Observations      []IndicatorObservation
+	Observations      []Observation
 }

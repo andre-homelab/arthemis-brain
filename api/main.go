@@ -106,6 +106,14 @@ func main() {
 		r.Delete("/delete/{id}", userHandler.DeleteUser)
 	})
 
+	observationHandler := handlers.ObservationHandler(logger, db)
+	r.Route("/user", func(r chi.Router) {
+		r.Post("/create", observationHandler.CreateObservations)
+		r.Get("/{id}", observationHandler.GetObservation)
+		r.Patch("/update/{id}", observationHandler.UpdateObservation)
+		r.Delete("/delete/{id}", observationHandler.DeleteObservation)
+	})
+
 	logger.Info("Server started!")
 	logger.Info("http://localhost:8081")
 
