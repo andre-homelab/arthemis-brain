@@ -22,7 +22,6 @@ func ProjectHandler(logger *slog.Logger, db *gorm.DB) *GlobalParams {
 // @Tags         project
 // @Accept       json
 // @Produce      json
-// @Param        id       path      string          true   "Proponent ID"
 // @Param        project  body      models.Project  true   "Project details"
 // @Success      202      {boolean} true            "Project created successfully"
 // @Failure      400      {object}  utils.ErrorResponse "Invalid JSON or bad request"

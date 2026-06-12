@@ -17,48 +17,51 @@ func ActivityHandler(logger *slog.Logger, db *gorm.DB) *GlobalParams {
 	return &GlobalParams{logger, db}
 }
 
-// @title           Create activity
-// @version         1.0
-// @description     Creates an activity
-// @termsOfService  http://swagger.io/terms/
-
-// @license.name  Apache 2.0
-// @license.url   http://www.apache.org/licenses/LICENSE-2.0.html
-
-// @host      localhost:8081
-// @BasePath  /activity/create
-
-// @securityDefinitions.basic  BasicAuth
-
+// @Summary      Create Activity
+// @Description  Creates an activity
+// @Tags         activity
+// @Produce      json
+// @Param        activity  body []models.Activity  true   "Activity details"
+// @Success      200  {array}   uint  "Activity created"
+// @Failure      400  {object}  utils.ErrorResponse "No activities provided"
+// @Failure      500  {object}  utils.ErrorResponse "Internal server error"
+// @Router       /activity/create [post]
 func (g *GlobalParams) CreateActivity(w http.ResponseWriter, r *http.Request) {
-	var reqActivity models.Activity
-	if err := json.NewDecoder(r.Body).Decode(&reqActivity); err != nil {
+	var reqActivities []models.Activity
+	if err := json.NewDecoder(r.Body).Decode(&reqActivities); err != nil {
 		utils.RespondError(w, http.StatusBadRequest, "Invalid JSON", err)
 		return
 	}
 
-	res := g.db.Create(&reqActivity)
-	if res.Error != nil {
-		utils.RespondError(w, http.StatusBadRequest, "Error creating the activity", res.Error)
+	if len(reqActivities) == 0 {
+		utils.RespondError(w, http.StatusBadRequest, "No activities provided", nil)
 		return
 	}
 
-	utils.RespondJSON(w, http.StatusAccepted, reqActivity.ID)
+	res := g.db.Create(&reqActivities)
+	if res.Error != nil {
+		utils.RespondError(w, http.StatusBadRequest, "Error creating the activities", res.Error)
+		return
+	}
+
+	ids := make([]uint, len(reqActivities))
+	for i, activity := range reqActivities {
+		ids[i] = activity.ID
+	}
+
+	utils.RespondJSON(w, http.StatusAccepted, ids)
 }
 
-// @title           Get activity
-// @version         1.0
-// @description     Reads an activity
-// @termsOfService  http://swagger.io/terms/
-
-// @license.name  Apache 2.0
-// @license.url   http://www.apache.org/licenses/LICENSE-2.0.html
-
-// @host      localhost:8081
-// @BasePath  /activity/{id}
-
-// @securityDefinitions.basic  BasicAuth
-
+// @Summary      Get Activity
+// @Description  Retrieves an activity
+// @Tags         activity
+// @Produce      json
+// @Param        id    path     string  true   "Activity ID"
+// @Success      200  {object}  models.Activity   "Acticity retrtieved successfully"
+// @Failure      400  {object}  utils.ErrorResponse "ID not informed"
+// @Failure      404  {object}  utils.ErrorResponse "Activity not found"
+// @Failure      500  {object}  utils.ErrorResponse "Internal server error"
+// @Router       /activity/{id} [get]
 func (g *GlobalParams) GetActivity(w http.ResponseWriter, r *http.Request) {
 	id := chi.URLParam(r, "id") // or mux.Vars(r)["id"] if using gorilla/mux
 	if id == "" {
@@ -67,7 +70,7 @@ func (g *GlobalParams) GetActivity(w http.ResponseWriter, r *http.Request) {
 	}
 
 	var activity models.Activity
-	res := g.db.First(&activity, "id = ?", id)
+	res := g.db.Preload("Locations").First(&activity, "id = ?", id)
 	if res.Error != nil {
 		if errors.Is(res.Error, gorm.ErrRecordNotFound) {
 			utils.RespondError(w, http.StatusNotFound, "Activity not found", res.Error)
@@ -80,19 +83,17 @@ func (g *GlobalParams) GetActivity(w http.ResponseWriter, r *http.Request) {
 	utils.RespondJSON(w, http.StatusOK, activity)
 }
 
-// @title           Update activity
-// @version         1.0
-// @description     Updates an activity
-// @termsOfService  http://swagger.io/terms/
-
-// @license.name  Apache 2.0
-// @license.url   http://www.apache.org/licenses/LICENSE-2.0.html
-
-// @host      localhost:8081
-// @BasePath  /activity/update/{id}
-
-// @securityDefinitions.basic  BasicAuth
-
+// @Summary      Update Activity
+// @Description  Updates an activity
+// @Tags         activity
+// @Produce      json
+// @Param        id    path     string  true   "Activity ID"
+// @Param        project  body      models.Activity  true   "Activity details to update"
+// @Success      200  {object}  models.Activty    "Activity updated successfully"
+// @Failure      400  {object}  utils.ErrorResponse "ID not informed"
+// @Failure      404  {object}  utils.ErrorResponse "Activity not found"
+// @Failure      500  {object}  utils.ErrorResponse "Internal server error"
+// @Router       /activity/update/{id} [put]
 func (g *GlobalParams) UpdateActivity(w http.ResponseWriter, r *http.Request) {
 	id := chi.URLParam(r, "id")
 	if id == "" {
@@ -127,19 +128,16 @@ func (g *GlobalParams) UpdateActivity(w http.ResponseWriter, r *http.Request) {
 	utils.RespondJSON(w, http.StatusOK, reqActivity)
 }
 
-// @title           Delete activity
-// @version         1.0
-// @description     Deletes an activity
-// @termsOfService  http://swagger.io/terms/
-
-// @license.name  Apache 2.0
-// @license.url   http://www.apache.org/licenses/LICENSE-2.0.html
-
-// @host      localhost:8081
-// @BasePath  /activity/delete/{id}
-
-// @securityDefinitions.basic  BasicAuth
-
+// @Summary      Delete Activity
+// @Description  Deletes an activity
+// @Tags         activity
+// @Produce      json
+// @Param        id    path     string  true   "Activity ID"
+// @Success      200  {boolean} true    "Activity removed successfully"
+// @Failure      400  {object}  utils.ErrorResponse "ID not informed"
+// @Failure      404  {object}  utils.ErrorResponse "Activity not found"
+// @Failure      500  {object}  utils.ErrorResponse "Internal server error"
+// @Router       /activity/delete/{id} [delete]
 func (g *GlobalParams) DeleteActivity(w http.ResponseWriter, r *http.Request) {
 	id := chi.URLParam(r, "id")
 	if id == "" {
