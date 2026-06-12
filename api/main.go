@@ -15,7 +15,9 @@ import (
 	"net/http"
 	"os"
 
+	"arthemis-brain/internal/audit"
 	"arthemis-brain/internal/database"
+	"arthemis-brain/internal/env"
 	"arthemis-brain/internal/handlers"
 
 	_ "arthemis-brain/docs"
@@ -41,12 +43,12 @@ func main() {
 		logger.Error("Error initializing database!")
 	}
 
-	r.Get("/", func(w http.ResponseWriter, r *http.Request) {
-		if _, err := w.Write([]byte("Hello World!")); err != nil {
-			logger.Error("Error")
-		}
-	})
+	// Configuração da Auditoria (com url do watcher configurável via env)
+	watcherURL := env.GetEnv("WATCHER_URL", "http://localhost:8082")
+	watcherClient := audit.NewWatcherClient(watcherURL)
+	auditMiddleware := audit.AuditMiddleware(watcherClient)
 
+	// Rotas Públicas (Sem Auditoria)
 	healthHandler := handlers.HealthHandler(logger, db)
 	r.Get("/health", healthHandler.HealthCheck)
 
@@ -54,30 +56,41 @@ func main() {
 		httpSwagger.URL("doc.json"),
 	))
 
-	proponentHandler := handlers.ProponentHandler(logger, db)
-	r.Route("/proponent", func(r chi.Router) {
-		r.Post("/create", proponentHandler.CreateProponent)
-		r.Get("/{id}", proponentHandler.GetProponent)
-		r.Get("/", proponentHandler.GetAllProponents)
-		r.Patch("/update/{id}", proponentHandler.UpdateProponent)
-		r.Delete("/delete/{id}", proponentHandler.DeleteProponent)
-	})
+	// Rotas Auditadas (Com Auditoria)
+	r.Group(func(r chi.Router) {
+		r.Use(auditMiddleware)
 
-	projectHandler := handlers.ProjectHandler(logger, db)
-	r.Route("/project", func(r chi.Router) {
-		r.Post("/create", projectHandler.CreateProject)
-		r.Get("/{id}", projectHandler.GetProject)
-		r.Put("/update/{id}", projectHandler.UpdateProject)
-		r.Delete("/delete/{id}", projectHandler.DeleteProject)
-	})
+		r.Get("/", func(w http.ResponseWriter, r *http.Request) {
+			if _, err := w.Write([]byte("Hello World!")); err != nil {
+				logger.Error("Error")
+			}
+		})
 
-	userHandler := handlers.UserHandler(logger, db)
-	r.Route("/user", func(r chi.Router) {
-		r.Post("/create", userHandler.CreateUser)
-		r.Get("/{id}", userHandler.GetUser)
-		r.Get("/", userHandler.GetAllUsers)
-		r.Patch("/update/{id}", userHandler.UpdateUser)
-		r.Delete("/delete/{id}", userHandler.DeleteUser)
+		proponentHandler := handlers.ProponentHandler(logger, db)
+		r.Route("/proponent", func(r chi.Router) {
+			r.Post("/create", proponentHandler.CreateProponent)
+			r.Get("/{id}", proponentHandler.GetProponent)
+			r.Get("/", proponentHandler.GetAllProponents)
+			r.Patch("/update/{id}", proponentHandler.UpdateProponent)
+			r.Delete("/delete/{id}", proponentHandler.DeleteProponent)
+		})
+
+		projectHandler := handlers.ProjectHandler(logger, db)
+		r.Route("/project", func(r chi.Router) {
+			r.Post("/create", projectHandler.CreateProject)
+			r.Get("/{id}", projectHandler.GetProject)
+			r.Put("/update/{id}", projectHandler.UpdateProject)
+			r.Delete("/delete/{id}", projectHandler.DeleteProject)
+		})
+
+		userHandler := handlers.UserHandler(logger, db)
+		r.Route("/user", func(r chi.Router) {
+			r.Post("/create", userHandler.CreateUser)
+			r.Get("/{id}", userHandler.GetUser)
+			r.Get("/", userHandler.GetAllUsers)
+			r.Patch("/update/{id}", userHandler.UpdateUser)
+			r.Delete("/delete/{id}", userHandler.DeleteUser)
+		})
 	})
 
 	logger.Info("Server started!")
