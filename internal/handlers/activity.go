@@ -57,7 +57,7 @@ func (g *GlobalParams) CreateActivity(w http.ResponseWriter, r *http.Request) {
 // @Tags         activity
 // @Produce      json
 // @Param        id    path     string  true   "Activity ID"
-// @Success      200  {object}  models.Activity   "Acticity retrtieved successfully"
+// @Success      200  {object}  models.Activity   "Activity retrtieved successfully"
 // @Failure      400  {object}  utils.ErrorResponse "ID not informed"
 // @Failure      404  {object}  utils.ErrorResponse "Activity not found"
 // @Failure      500  {object}  utils.ErrorResponse "Internal server error"

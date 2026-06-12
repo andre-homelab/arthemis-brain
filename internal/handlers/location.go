@@ -17,48 +17,51 @@ func LocationHandler(logger *slog.Logger, db *gorm.DB) *GlobalParams {
 	return &GlobalParams{logger, db}
 }
 
-// @title           Create location
-// @version         1.0
-// @description     Creates a location
-// @termsOfService  http://swagger.io/terms/
-
-// @license.name  Apache 2.0
-// @license.url   http://www.apache.org/licenses/LICENSE-2.0.html
-
-// @host      localhost:8081
-// @BasePath  /location/create
-
-// @securityDefinitions.basic  BasicAuth
-
+// @Summary      Create Locations
+// @Description  Creates multiple locations
+// @Tags         location
+// @Produce      json
+// @Param        locations  body      []models.Location  true   "List of location details"
+// @Success      202  {array}   uint                "IDs of created locations"
+// @Failure      400  {object}  utils.ErrorResponse "Invalid request body"
+// @Failure      500  {object}  utils.ErrorResponse "Internal server error"
+// @Router       /location/create [post]
 func (g *GlobalParams) CreateLocation(w http.ResponseWriter, r *http.Request) {
-	var reqLocation models.Location
-	if err := json.NewDecoder(r.Body).Decode(&reqLocation); err != nil {
+	var reqLocations []models.Location
+	if err := json.NewDecoder(r.Body).Decode(&reqLocations); err != nil {
 		utils.RespondError(w, http.StatusBadRequest, "Invalid JSON", err)
 		return
 	}
 
-	res := g.db.Create(&reqLocation)
-	if res.Error != nil {
-		utils.RespondError(w, http.StatusBadRequest, "Error creating the location", res.Error)
+	if len(reqLocations) == 0 {
+		utils.RespondError(w, http.StatusBadRequest, "No locations provided", nil)
 		return
 	}
 
-	utils.RespondJSON(w, http.StatusAccepted, reqLocation.ID)
+	res := g.db.Create(&reqLocations)
+	if res.Error != nil {
+		utils.RespondError(w, http.StatusBadRequest, "Error creating the locations", res.Error)
+		return
+	}
+
+	ids := make([]uint, len(reqLocations))
+	for i, location := range reqLocations {
+		ids[i] = location.ID
+	}
+
+	utils.RespondJSON(w, http.StatusAccepted, ids)
 }
 
-// @title           Get location
-// @version         1.0
-// @description     Reads a location
-// @termsOfService  http://swagger.io/terms/
-
-// @license.name  Apache 2.0
-// @license.url   http://www.apache.org/licenses/LICENSE-2.0.html
-
-// @host      localhost:8081
-// @BasePath  /location/{id}
-
-// @securityDefinitions.basic  BasicAuth
-
+// @Summary      Get Location
+// @Description  Retrieves a location
+// @Tags         location
+// @Produce      json
+// @Param        id    path     string  true   "Location ID"
+// @Success      200  {object}  models.Location   "Location retrtieved successfully"
+// @Failure      400  {object}  utils.ErrorResponse "ID not informed"
+// @Failure      404  {object}  utils.ErrorResponse "Location not found"
+// @Failure      500  {object}  utils.ErrorResponse "Internal server error"
+// @Router       /location/{id} [get]
 func (g *GlobalParams) GetLocation(w http.ResponseWriter, r *http.Request) {
 	id := chi.URLParam(r, "id") // or mux.Vars(r)["id"] if using gorilla/mux
 	if id == "" {
@@ -80,19 +83,17 @@ func (g *GlobalParams) GetLocation(w http.ResponseWriter, r *http.Request) {
 	utils.RespondJSON(w, http.StatusOK, location)
 }
 
-// @title           Update location
-// @version         1.0
-// @description     Updates a location
-// @termsOfService  http://swagger.io/terms/
-
-// @license.name  Apache 2.0
-// @license.url   http://www.apache.org/licenses/LICENSE-2.0.html
-
-// @host      localhost:8081
-// @BasePath  /location/update/{id}
-
-// @securityDefinitions.basic  BasicAuth
-
+// @Summary      Update Location
+// @Description  Updates a location
+// @Tags         location
+// @Produce      json
+// @Param        id    path     string  true   "Location ID"
+// @Param        project  body      models.Location  true   "Location details to update"
+// @Success      200  {object}  models.Location    "Location updated successfully"
+// @Failure      400  {object}  utils.ErrorResponse "ID not informed"
+// @Failure      404  {object}  utils.ErrorResponse "Location not found"
+// @Failure      500  {object}  utils.ErrorResponse "Internal server error"
+// @Router       /location/update/{id} [put]
 func (g *GlobalParams) UpdateLocation(w http.ResponseWriter, r *http.Request) {
 	id := chi.URLParam(r, "id")
 	if id == "" {
@@ -127,19 +128,16 @@ func (g *GlobalParams) UpdateLocation(w http.ResponseWriter, r *http.Request) {
 	utils.RespondJSON(w, http.StatusOK, reqLocation)
 }
 
-// @title           Delete location
-// @version         1.0
-// @description     Deletes a location
-// @termsOfService  http://swagger.io/terms/
-
-// @license.name  Apache 2.0
-// @license.url   http://www.apache.org/licenses/LICENSE-2.0.html
-
-// @host      localhost:8081
-// @BasePath  /location/delete/{id}
-
-// @securityDefinitions.basic  BasicAuth
-
+// @Summary      Delete Location
+// @Description  Deletes a Location
+// @Tags         location
+// @Produce      json
+// @Param        id    path     string  true   "Location ID"
+// @Success      200  {boolean} true    "Location removed successfully"
+// @Failure      400  {object}  utils.ErrorResponse "ID not informed"
+// @Failure      404  {object}  utils.ErrorResponse "Location not found"
+// @Failure      500  {object}  utils.ErrorResponse "Internal server error"
+// @Router       /location/delete/{id} [delete]
 func (g *GlobalParams) DeleteLocation(w http.ResponseWriter, r *http.Request) {
 	id := chi.URLParam(r, "id")
 	if id == "" {

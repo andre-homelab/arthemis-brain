@@ -17,46 +17,51 @@ func IndicatorHandler(logger *slog.Logger, db *gorm.DB) *GlobalParams {
 	return &GlobalParams{logger, db}
 }
 
-// @title           Create indicator
-// @version         1.0
-// @description     Creates an indicator
-// @termsOfService  http://swagger.io/terms/
-
-// @license.name  Apache 2.0
-// @license.url   http://www.apache.org/licenses/LICENSE-2.0.html
-
-// @host      localhost:8081
-// @BasePath  /indicator/create
-
-// @securityDefinitions.basic  BasicAuth
-
+// @Summary      Create Indicators
+// @Description  Creates multiple indicators
+// @Tags         indicator
+// @Produce      json
+// @Param        indicators  body      []models.Indicator  true   "List of indicator details"
+// @Success      202  {array}   uint                "IDs of created indicators"
+// @Failure      400  {object}  utils.ErrorResponse "Invalid request body"
+// @Failure      500  {object}  utils.ErrorResponse "Internal server error"
+// @Router       /indicator/create [post]
 func (g *GlobalParams) CreateIndicator(w http.ResponseWriter, r *http.Request) {
-	var reqindicator models.Proponent
-	if err := json.NewDecoder(r.Body).Decode(&reqindicator); err != nil {
-		utils.RespondError(w, http.StatusBadRequest, "JSON inválido", err)
+	var reqIndicators []models.Indicator
+	if err := json.NewDecoder(r.Body).Decode(&reqIndicators); err != nil {
+		utils.RespondError(w, http.StatusBadRequest, "Invalid JSON", err)
 		return
 	}
-	res := g.db.Create(&reqindicator)
+
+	if len(reqIndicators) == 0 {
+		utils.RespondError(w, http.StatusBadRequest, "No indicators provided", nil)
+		return
+	}
+
+	res := g.db.Create(&reqIndicators)
 	if res.Error != nil {
-		utils.RespondError(w, http.StatusBadRequest, "Erro ao criar o indicatore", res.Error)
+		utils.RespondError(w, http.StatusBadRequest, "Error creating the indicators", res.Error)
 		return
 	}
-	utils.RespondJSON(w, http.StatusAccepted, reqindicator.ID)
+
+	ids := make([]uint, len(reqIndicators))
+	for i, indicator := range reqIndicators {
+		ids[i] = indicator.ID
+	}
+
+	utils.RespondJSON(w, http.StatusAccepted, ids)
 }
 
-// @title           Get indicator
-// @version         1.0
-// @description     Reads an indicator
-// @termsOfService  http://swagger.io/terms/
-
-// @license.name  Apache 2.0
-// @license.url   http://www.apache.org/licenses/LICENSE-2.0.html
-
-// @host      localhost:8081
-// @BasePath  /indicator/{id}
-
-// @securityDefinitions.basic  BasicAuth
-
+// @Summary      Get Indicator
+// @Description  Retrieves an indicator
+// @Tags         indicator
+// @Produce      json
+// @Param        id    path     string  true   "Indicator ID"
+// @Success      200  {object}  models.Activity   "Indicator retrtieved successfully"
+// @Failure      400  {object}  utils.ErrorResponse "ID not informed"
+// @Failure      404  {object}  utils.ErrorResponse "Indicator not found"
+// @Failure      500  {object}  utils.ErrorResponse "Internal server error"
+// @Router       /indicator/{id} [get]
 func (g *GlobalParams) GetIndicator(w http.ResponseWriter, r *http.Request) {
 	id := chi.URLParam(r, "id") // or mux.Vars(r)["id"] if using gorilla/mux
 	if id == "" {
@@ -78,19 +83,17 @@ func (g *GlobalParams) GetIndicator(w http.ResponseWriter, r *http.Request) {
 	utils.RespondJSON(w, http.StatusOK, indicator)
 }
 
-// @title           Update indicator
-// @version         1.0
-// @description     Updates an indicator
-// @termsOfService  http://swagger.io/terms/
-
-// @license.name  Apache 2.0
-// @license.url   http://www.apache.org/licenses/LICENSE-2.0.html
-
-// @host      localhost:8081
-// @BasePath  /indicator/update/{id}
-
-// @securityDefinitions.basic  BasicAuth
-
+// @Summary      Update Indicator
+// @Description  Updates a indicator
+// @Tags         indicator
+// @Produce      json
+// @Param        id    path     string  true   "Indicator ID"
+// @Param        project  body      models.Location  true   "Indicator details to update"
+// @Success      200  {object}  models.Location    "Indicator updated successfully"
+// @Failure      400  {object}  utils.ErrorResponse "ID not informed"
+// @Failure      404  {object}  utils.ErrorResponse "Indicator not found"
+// @Failure      500  {object}  utils.ErrorResponse "Internal server error"
+// @Router       /indicator/update/{id} [put]
 func (g *GlobalParams) UpdateIndicator(w http.ResponseWriter, r *http.Request) {
 	id := chi.URLParam(r, "id")
 	if id == "" {
@@ -125,19 +128,17 @@ func (g *GlobalParams) UpdateIndicator(w http.ResponseWriter, r *http.Request) {
 	utils.RespondJSON(w, http.StatusOK, reqindicator)
 }
 
-// @title           Delete indicator
-// @version         1.0
-// @description     Deletes a indicator
-// @termsOfService  http://swagger.io/terms/
-
-// @license.name  Apache 2.0
-// @license.url   http://www.apache.org/licenses/LICENSE-2.0.html
-
-// @host      localhost:8081
-// @BasePath  /indicator/delete/{id}
-
 // @securityDefinitions.basic  BasicAuth
-
+// @Summary      Delete Indicator
+// @Description  Deletes an Indicator
+// @Tags         location
+// @Produce      json
+// @Param        id    path     string  true   "Indicator ID"
+// @Success      200  {boolean} true    "Indicator removed successfully"
+// @Failure      400  {object}  utils.ErrorResponse "ID not informed"
+// @Failure      404  {object}  utils.ErrorResponse "Indicator not found"
+// @Failure      500  {object}  utils.ErrorResponse "Internal server error"
+// @Router       /indicator/delete/{id} [delete]
 func (g *GlobalParams) DeleteIndicator(w http.ResponseWriter, r *http.Request) {
 	id := chi.URLParam(r, "id")
 	if id == "" {
