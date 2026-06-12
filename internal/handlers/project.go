@@ -17,19 +17,18 @@ func ProjectHandler(logger *slog.Logger, db *gorm.DB) *GlobalParams {
 	return &GlobalParams{logger, db}
 }
 
-// @title           Create project
-// @version         1.0
-// @description     Creates a project
-// @termsOfService  http://swagger.io/terms/
-
-// @license.name  Apache 2.0
-// @license.url   http://www.apache.org/licenses/LICENSE-2.0.html
-
-// @host      localhost:8081
-// @BasePath  /project/create
-
-// @securityDefinitions.basic  BasicAuth
-
+// @Summary      Create project
+// @Description  Creates a new project associated with a proponent ID
+// @Tags         project
+// @Accept       json
+// @Produce      json
+// @Param        id       path      string          true   "Proponent ID"
+// @Param        project  body      models.Project  true   "Project details"
+// @Success      202      {boolean} true            "Project created successfully"
+// @Failure      400      {object}  utils.ErrorResponse "Invalid JSON or bad request"
+// @Failure      401      {object}  utils.ErrorResponse "Unauthorized: proponent_id context missing"
+// @Failure      409      {object}  utils.ErrorResponse "Proponent already has a project"
+// @Router       /project/{id} [post]
 func (g *GlobalParams) CreateProject(w http.ResponseWriter, r *http.Request) {
 	var reqProject models.Project
 	if err := json.NewDecoder(r.Body).Decode(&reqProject); err != nil {
@@ -46,19 +45,16 @@ func (g *GlobalParams) CreateProject(w http.ResponseWriter, r *http.Request) {
 	utils.RespondJSON(w, http.StatusAccepted, reqProject.ID)
 }
 
-// @title           Get project
-// @version         1.0
-// @description     Reads a project
-// @termsOfService  http://swagger.io/terms/
-
-// @license.name  Apache 2.0
-// @license.url   http://www.apache.org/licenses/LICENSE-2.0.html
-
-// @host      localhost:8081
-// @BasePath  /project/{id}
-
-// @securityDefinitions.basic  BasicAuth
-
+// @Summary      Get project
+// @Description  Retrieves a project by ID
+// @Tags         project
+// @Produce      json
+// @Param        id   path      string  true  "Project ID"
+// @Success      200  {object}  models.Project
+// @Failure      400  {object}  utils.ErrorResponse "ProjectID not received"
+// @Failure      404  {object}  utils.ErrorResponse "Project not found"
+// @Failure      500  {object}  utils.ErrorResponse "Internal server error"
+// @Router       /project/{id} [get]
 func (g *GlobalParams) GetProject(w http.ResponseWriter, r *http.Request) {
 	id := chi.URLParam(r, "id") // or mux.Vars(r)["id"] if using gorilla/mux
 	if id == "" {
@@ -80,19 +76,18 @@ func (g *GlobalParams) GetProject(w http.ResponseWriter, r *http.Request) {
 	utils.RespondJSON(w, http.StatusOK, project)
 }
 
-// @title           Update project
-// @version         1.0
-// @description     Updates a project
-// @termsOfService  http://swagger.io/terms/
-
-// @license.name  Apache 2.0
-// @license.url   http://www.apache.org/licenses/LICENSE-2.0.html
-
-// @host      localhost:8081
-// @BasePath  /project/update/{id}
-
-// @securityDefinitions.basic  BasicAuth
-
+// @Summary      Update project
+// @Description  Updates an existing project by ID
+// @Tags         project
+// @Accept       json
+// @Produce      json
+// @Param        id       path      string          true   "Project ID"
+// @Param        project  body      models.Project  true   "Project details to update"
+// @Success      200      {object}  models.Project
+// @Failure      400      {object}  utils.ErrorResponse "Invalid JSON or ProjectID not received"
+// @Failure      404      {object}  utils.ErrorResponse "Project not found"
+// @Failure      500      {object}  utils.ErrorResponse "Internal server error"
+// @Router       /project/{id} [put]
 func (g *GlobalParams) UpdateProject(w http.ResponseWriter, r *http.Request) {
 	id := chi.URLParam(r, "id")
 	if id == "" {
@@ -127,19 +122,16 @@ func (g *GlobalParams) UpdateProject(w http.ResponseWriter, r *http.Request) {
 	utils.RespondJSON(w, http.StatusOK, reqProject)
 }
 
-// @title           Delete project
-// @version         1.0
-// @description     Deletes a project
-// @termsOfService  http://swagger.io/terms/
-
-// @license.name  Apache 2.0
-// @license.url   http://www.apache.org/licenses/LICENSE-2.0.html
-
-// @host      localhost:8081
-// @BasePath  /project/delete/{id}
-
-// @securityDefinitions.basic  BasicAuth
-
+// @Summary      Delete Project
+// @Description  Deletes a project by ID
+// @Tags         project
+// @Produce      json
+// @Param        id   path      string  true  "Project ID"
+// @Success      200  {boolean} true    "Project deleted successfully"
+// @Failure      400  {object}  utils.ErrorResponse "ID not informed"
+// @Failure      404  {object}  utils.ErrorResponse "Project not found"
+// @Failure      500  {object}  utils.ErrorResponse "Internal server error"
+// @Router       /project/{id} [delete]
 func (g *GlobalParams) DeleteProject(w http.ResponseWriter, r *http.Request) {
 	id := chi.URLParam(r, "id")
 	if id == "" {
@@ -160,19 +152,16 @@ func (g *GlobalParams) DeleteProject(w http.ResponseWriter, r *http.Request) {
 	utils.RespondJSON(w, http.StatusOK, true)
 }
 
-// @title           Add Proponent To Project
-// @version         1.0
-// @description     Creates association between proponent and project on project_proponent table
-// @termsOfService  http://swagger.io/terms/
-
-// @license.name  Apache 2.0
-// @license.url   http://www.apache.org/licenses/LICENSE-2.0.html
-
-// @host      localhost:8081
-// @BasePath  /project/{id}/addproponent
-
-// @securityDefinitions.basic  BasicAuth
-
+// @Summary      Add Proponent
+// @Description  Adds proponent to a project by ID
+// @Tags         project
+// @Produce      json
+// @Param        id   path      string  true  "Project ID"
+// @Success      200  {boolean} true    "Proponent added successfully"
+// @Failure      400  {object}  utils.ErrorResponse "ID not informed"
+// @Failure      404  {object}  utils.ErrorResponse "Project not found"
+// @Failure      500  {object}  utils.ErrorResponse "Internal server error"
+// @Router       /project/{id}/add_proponent [post]
 func (g *GlobalParams) AddProponent(w http.ResponseWriter, r *http.Request) {
 	id := chi.URLParam(r, "id")
 	if id == "" {
@@ -206,19 +195,17 @@ func (g *GlobalParams) AddProponent(w http.ResponseWriter, r *http.Request) {
 	utils.RespondJSON(w, http.StatusOK, projectProponent.ID)
 }
 
-// @title           Remove Proponent from Project
-// @version         1.0
-// @description     Remoces association between proponent and project on project_proponent table
-// @termsOfService  http://swagger.io/terms/
-
-// @license.name  Apache 2.0
-// @license.url   http://www.apache.org/licenses/LICENSE-2.0.html
-
-// @host      localhost:8081
-// @BasePath  /project/{projectId}/remove_proponent/{proponentId}
-
-// @securityDefinitions.basic  BasicAuth
-
+// @Summary      Remove Proponent
+// @Description  Removes proponent from a project by ID
+// @Tags         project
+// @Produce      json
+// @Param        projectId   path      string  true  "Project ID"
+// @Param        proponentId   path      string  true  "Project ID"
+// @Success      200  {boolean} true    "Proponent removed successfully"
+// @Failure      400  {object}  utils.ErrorResponse "ID not informed"
+// @Failure      404  {object}  utils.ErrorResponse "Project not found"
+// @Failure      500  {object}  utils.ErrorResponse "Internal server error"
+// @Router       /project/{projectId}/remove_proponent/{proponentId} [delete]
 func (g *GlobalParams) RemoveProponent(w http.ResponseWriter, r *http.Request) {
 	projectID := chi.URLParam(r, "projectId")
 	if projectID == "" {

@@ -18,19 +18,13 @@ func HealthHandler(logger *slog.Logger, db *gorm.DB) *GlobalParams {
 	return &GlobalParams{logger, db}
 }
 
-// @title           Health Cheack
-// @version         1.0
-// @description     Evaluates the status of the server and database
-// @termsOfService  http://swagger.io/terms/
-
-// @license.name  Apache 2.0
-// @license.url   http://www.apache.org/licenses/LICENSE-2.0.html
-
-// @host      localhost:8081
-// @BasePath  /health
-
-// @securityDefinitions.basic  BasicAuth
-
+// HealthCheck evaluates the status of the server and database
+// @Summary      Health Check
+// @Description  Evaluates the status of the server and database
+// @Tags         health
+// @Produce      json
+// @Success      200  {object}  map[string]string "Successful response containing status, db connection, and timestamp"
+// @Router       /health [get]
 func (g *GlobalParams) HealthCheck(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("content-type", "application/json")
 	w.WriteHeader(http.StatusOK)

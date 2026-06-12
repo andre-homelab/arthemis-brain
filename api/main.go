@@ -1,3 +1,13 @@
+// @title           Arthemis Brain API
+// @version         1.0
+// @description     API service for Arthemis Brain.
+// @termsOfService  http://swagger.io/terms/
+
+// @license.name  MIT
+// @license.url   http://opensource.org/licenses/MIT
+
+// @host      localhost:8081
+// @BasePath  /
 package main
 
 import (
@@ -8,8 +18,11 @@ import (
 	"arthemis-brain/internal/database"
 	"arthemis-brain/internal/handlers"
 
+	_ "arthemis-brain/docs"
+
 	"github.com/go-chi/chi/v5"
 	chiMiddleware "github.com/go-chi/chi/v5/middleware"
+	httpSwagger "github.com/swaggo/http-swagger"
 )
 
 func main() {
@@ -36,6 +49,10 @@ func main() {
 
 	healthHandler := handlers.HealthHandler(logger, db)
 	r.Get("/health", healthHandler.HealthCheck)
+
+	r.Get("/swagger/*", httpSwagger.Handler(
+		httpSwagger.URL("doc.json"),
+	))
 
 	proponentHandler := handlers.ProponentHandler(logger, db)
 	r.Route("/proponent", func(r chi.Router) {
@@ -78,6 +95,15 @@ func main() {
 		r.Get("/{id}", indicatorHandler.GetIndicator)
 		r.Put("/update/{id}", indicatorHandler.UpdateIndicator)
 		r.Delete("/delete/{id}", indicatorHandler.DeleteIndicator)
+	})
+
+	userHandler := handlers.UserHandler(logger, db)
+	r.Route("/user", func(r chi.Router) {
+		r.Post("/create", userHandler.CreateUser)
+		r.Get("/{id}", userHandler.GetUser)
+		r.Get("/", userHandler.GetAllUsers)
+		r.Patch("/update/{id}", userHandler.UpdateUser)
+		r.Delete("/delete/{id}", userHandler.DeleteUser)
 	})
 
 	logger.Info("Server started!")
