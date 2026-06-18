@@ -1,13 +1,12 @@
 package handlers
 
 import (
+	"arthemis-brain/internal/models"
+	"arthemis-brain/internal/utils"
 	"encoding/json"
 	"errors"
 	"log/slog"
 	"net/http"
-
-	"arthemis-brain/internal/models"
-	"arthemis-brain/internal/utils"
 
 	"github.com/go-chi/chi/v5"
 	"gorm.io/gorm"
@@ -131,7 +130,7 @@ func (g *GlobalParams) UpdateIndicator(w http.ResponseWriter, r *http.Request) {
 // @securityDefinitions.basic  BasicAuth
 // @Summary      Delete Indicator
 // @Description  Deletes an Indicator
-// @Tags         location
+// @Tags         indicator
 // @Produce      json
 // @Param        id    path     string  true   "Indicator ID"
 // @Success      200  {boolean} true    "Indicator removed successfully"

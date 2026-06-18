@@ -962,15 +962,9 @@ paths:
       summary: Update project
       tags:
       - project
-  /proponent/{id}:
-    delete:
-      description: Deletes a proponent by ID
-      parameters:
-      - description: Proponent ID
-        in: path
-        name: id
-        required: true
-        type: string
+  /proponent/:
+    get:
+      description: Retrieves every proponent
       produces:
       - application/json
       responses:
@@ -978,10 +972,6 @@ paths:
           description: Proponent deleted successfully
           schema:
             type: boolean
-        "400":
-          description: ProponentID not found
-          schema:
-            $ref: '#/definitions/utils.ErrorResponse'
         "404":
           description: Proponent not found
           schema:
@@ -990,9 +980,10 @@ paths:
           description: Internal server error
           schema:
             $ref: '#/definitions/utils.ErrorResponse'
-      summary: Delete Proponent
+      summary: Gets all proponents
       tags:
       - proponent
+  /proponent/{id}:
     get:
       description: Retrieves a proponent by ID
       parameters:
@@ -1023,6 +1014,64 @@ paths:
       summary: Get Proponent
       tags:
       - proponent
+  /proponent/create:
+    post:
+      consumes:
+      - application/json
+      description: Creates a new proponent
+      parameters:
+      - description: Proponent details
+        in: body
+        name: proponent
+        required: true
+        schema:
+          $ref: '#/definitions/models.Proponent'
+      produces:
+      - application/json
+      responses:
+        "202":
+          description: Proponent created successfully
+          schema:
+            type: boolean
+        "400":
+          description: Invalid JSON or bad request
+          schema:
+            $ref: '#/definitions/utils.ErrorResponse'
+      summary: Create Proponent
+      tags:
+      - proponent
+  /proponent/delete/{id}:
+    delete:
+      description: Deletes a proponent by ID
+      parameters:
+      - description: Proponent ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Proponent deleted successfully
+          schema:
+            type: boolean
+        "400":
+          description: ProponentID not found
+          schema:
+            $ref: '#/definitions/utils.ErrorResponse'
+        "404":
+          description: Proponent not found
+          schema:
+            $ref: '#/definitions/utils.ErrorResponse'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/utils.ErrorResponse'
+      summary: Delete Proponent
+      tags:
+      - proponent
+  /proponent/update/{id}:
     patch:
       consumes:
       - application/json
@@ -1059,36 +1108,6 @@ paths:
           schema:
             $ref: '#/definitions/utils.ErrorResponse'
       summary: Update Proponent
-      tags:
-      - proponent
-    post:
-      consumes:
-      - application/json
-      description: Creates a new proponent
-      parameters:
-      - description: Proponent ID
-        in: path
-        name: id
-        required: true
-        type: string
-      - description: Proponent details
-        in: body
-        name: proponent
-        required: true
-        schema:
-          $ref: '#/definitions/models.Proponent'
-      produces:
-      - application/json
-      responses:
-        "202":
-          description: Proponent created successfully
-          schema:
-            type: boolean
-        "400":
-          description: Invalid JSON or bad request
-          schema:
-            $ref: '#/definitions/utils.ErrorResponse'
-      summary: Create Proponent
       tags:
       - proponent
 swagger: "2.0"

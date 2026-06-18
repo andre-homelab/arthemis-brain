@@ -1,13 +1,12 @@
 package handlers
 
 import (
+	"arthemis-brain/internal/models"
+	"arthemis-brain/internal/utils"
 	"encoding/json"
 	"errors"
 	"log/slog"
 	"net/http"
-
-	"arthemis-brain/internal/models"
-	"arthemis-brain/internal/utils"
 
 	"github.com/go-chi/chi/v5"
 	"gorm.io/gorm"
@@ -22,11 +21,10 @@ func ProponentHandler(logger *slog.Logger, db *gorm.DB) *GlobalParams {
 // @Tags         proponent
 // @Accept       json
 // @Produce      json
-// @Param        id         path      string            true   "Proponent ID"
 // @Param        proponent  body      models.Proponent  true   "Proponent details"
 // @Success      202        {boolean} true              "Proponent created successfully"
 // @Failure      400        {object}  utils.ErrorResponse "Invalid JSON or bad request"
-// @Router       /proponent/{id} [post]
+// @Router       /proponent/create [post]
 func (g *GlobalParams) CreateProponent(w http.ResponseWriter, r *http.Request) {
 	var reqProponent models.Proponent
 	if err := json.NewDecoder(r.Body).Decode(&reqProponent); err != nil {
@@ -83,7 +81,7 @@ func (g *GlobalParams) GetProponent(w http.ResponseWriter, r *http.Request) {
 // @Failure      400        {object}  utils.ErrorResponse "Invalid JSON or ProponentID not found"
 // @Failure      404        {object}  utils.ErrorResponse "Proponent not found"
 // @Failure      500        {object}  utils.ErrorResponse "Internal server error"
-// @Router       /proponent/{id} [patch]
+// @Router       /proponent/update/{id} [patch]
 func (g *GlobalParams) UpdateProponent(w http.ResponseWriter, r *http.Request) {
 	id := chi.URLParam(r, "id")
 	if id == "" {
@@ -127,7 +125,7 @@ func (g *GlobalParams) UpdateProponent(w http.ResponseWriter, r *http.Request) {
 // @Failure      400  {object}  utils.ErrorResponse "ProponentID not found"
 // @Failure      404  {object}  utils.ErrorResponse "Proponent not found"
 // @Failure      500  {object}  utils.ErrorResponse "Internal server error"
-// @Router       /proponent/{id} [delete]
+// @Router       /proponent/delete/{id} [delete]
 func (g *GlobalParams) DeleteProponent(w http.ResponseWriter, r *http.Request) {
 	id := chi.URLParam(r, "id")
 	if id == "" {
@@ -148,19 +146,14 @@ func (g *GlobalParams) DeleteProponent(w http.ResponseWriter, r *http.Request) {
 	utils.RespondJSON(w, http.StatusOK, true)
 }
 
-// @title           Get All Proponent
-// @version         1.0
-// @description     Returns all proponents
-// @termsOfService  http://swagger.io/terms/
-
-// @license.name  Apache 2.0
-// @license.url   http://www.apache.org/licenses/LICENSE-2.0.html
-
-// @host      localhost:8081
-// @BasePath  /proponent/
-
-// @securityDefinitions.basic  BasicAuth
-
+// @Summary      Gets all proponents
+// @Description  Retrieves every proponent
+// @Tags         proponent
+// @Produce      json
+// @Success      200  {boolean} true    "Proponent deleted successfully"
+// @Failure      404  {object}  utils.ErrorResponse "Proponent not found"
+// @Failure      500  {object}  utils.ErrorResponse "Internal server error"
+// @Router       /proponent/ [get]
 func (g *GlobalParams) GetAllProponents(w http.ResponseWriter, r *http.Request) {
 	var proponents []models.Proponent
 	res := g.db.Preload("Projects").Find(&proponents)

@@ -1163,36 +1163,21 @@ const docTemplate = `{
                 }
             }
         },
-        "/proponent/{id}": {
+        "/proponent/": {
             "get": {
-                "description": "Retrieves a proponent by ID",
+                "description": "Retrieves every proponent",
                 "produces": [
                     "application/json"
                 ],
                 "tags": [
                     "proponent"
                 ],
-                "summary": "Get Proponent",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "Proponent ID",
-                        "name": "id",
-                        "in": "path",
-                        "required": true
-                    }
-                ],
+                "summary": "Gets all proponents",
                 "responses": {
                     "200": {
-                        "description": "OK",
+                        "description": "Proponent deleted successfully",
                         "schema": {
-                            "$ref": "#/definitions/models.Proponent"
-                        }
-                    },
-                    "400": {
-                        "description": "ProponentID not found",
-                        "schema": {
-                            "$ref": "#/definitions/utils.ErrorResponse"
+                            "type": "boolean"
                         }
                     },
                     "404": {
@@ -1208,7 +1193,9 @@ const docTemplate = `{
                         }
                     }
                 }
-            },
+            }
+        },
+        "/proponent/create": {
             "post": {
                 "description": "Creates a new proponent",
                 "consumes": [
@@ -1222,13 +1209,6 @@ const docTemplate = `{
                 ],
                 "summary": "Create Proponent",
                 "parameters": [
-                    {
-                        "type": "string",
-                        "description": "Proponent ID",
-                        "name": "id",
-                        "in": "path",
-                        "required": true
-                    },
                     {
                         "description": "Proponent details",
                         "name": "proponent",
@@ -1253,7 +1233,9 @@ const docTemplate = `{
                         }
                     }
                 }
-            },
+            }
+        },
+        "/proponent/delete/{id}": {
             "delete": {
                 "description": "Deletes a proponent by ID",
                 "produces": [
@@ -1298,7 +1280,9 @@ const docTemplate = `{
                         }
                     }
                 }
-            },
+            }
+        },
+        "/proponent/update/{id}": {
             "patch": {
                 "description": "Updates an existing proponent by ID",
                 "consumes": [
@@ -1338,6 +1322,53 @@ const docTemplate = `{
                     },
                     "400": {
                         "description": "Invalid JSON or ProponentID not found",
+                        "schema": {
+                            "$ref": "#/definitions/utils.ErrorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Proponent not found",
+                        "schema": {
+                            "$ref": "#/definitions/utils.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "$ref": "#/definitions/utils.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/proponent/{id}": {
+            "get": {
+                "description": "Retrieves a proponent by ID",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "proponent"
+                ],
+                "summary": "Get Proponent",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Proponent ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/models.Proponent"
+                        }
+                    },
+                    "400": {
+                        "description": "ProponentID not found",
                         "schema": {
                             "$ref": "#/definitions/utils.ErrorResponse"
                         }
