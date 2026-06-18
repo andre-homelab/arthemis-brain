@@ -1,13 +1,12 @@
 package handlers
 
 import (
+	"arthemis-brain/internal/models"
+	"arthemis-brain/internal/utils"
 	"encoding/json"
 	"errors"
 	"log/slog"
 	"net/http"
-
-	"arthemis-brain/internal/models"
-	"arthemis-brain/internal/utils"
 
 	"github.com/go-chi/chi/v5"
 	"gorm.io/gorm"
@@ -27,7 +26,7 @@ func ProjectHandler(logger *slog.Logger, db *gorm.DB) *GlobalParams {
 // @Failure      400      {object}  utils.ErrorResponse "Invalid JSON or bad request"
 // @Failure      401      {object}  utils.ErrorResponse "Unauthorized: proponent_id context missing"
 // @Failure      409      {object}  utils.ErrorResponse "Proponent already has a project"
-// @Router       /project/{id} [post]
+// @Router       /project/create [post]
 func (g *GlobalParams) CreateProject(w http.ResponseWriter, r *http.Request) {
 	var reqProject models.Project
 	if err := json.NewDecoder(r.Body).Decode(&reqProject); err != nil {
@@ -86,7 +85,7 @@ func (g *GlobalParams) GetProject(w http.ResponseWriter, r *http.Request) {
 // @Failure      400      {object}  utils.ErrorResponse "Invalid JSON or ProjectID not received"
 // @Failure      404      {object}  utils.ErrorResponse "Project not found"
 // @Failure      500      {object}  utils.ErrorResponse "Internal server error"
-// @Router       /project/{id} [put]
+// @Router       /project/update/{id} [put]
 func (g *GlobalParams) UpdateProject(w http.ResponseWriter, r *http.Request) {
 	id := chi.URLParam(r, "id")
 	if id == "" {
@@ -130,7 +129,7 @@ func (g *GlobalParams) UpdateProject(w http.ResponseWriter, r *http.Request) {
 // @Failure      400  {object}  utils.ErrorResponse "ID not informed"
 // @Failure      404  {object}  utils.ErrorResponse "Project not found"
 // @Failure      500  {object}  utils.ErrorResponse "Internal server error"
-// @Router       /project/{id} [delete]
+// @Router       /project/delete/{id} [delete]
 func (g *GlobalParams) DeleteProject(w http.ResponseWriter, r *http.Request) {
 	id := chi.URLParam(r, "id")
 	if id == "" {
@@ -151,15 +150,22 @@ func (g *GlobalParams) DeleteProject(w http.ResponseWriter, r *http.Request) {
 	utils.RespondJSON(w, http.StatusOK, true)
 }
 
-// @Summary      Add Proponent
-// @Description  Adds proponent to a project by ID
+type ProponentInput struct {
+	ProponentID uint   `json:"proponentId"`
+	Role        string `json:"role"`
+}
+
+// @Summary      Add Proponents
+// @Description  Adds multiple proponents to a project by ID
 // @Tags         project
+// @Accept       json
 // @Produce      json
-// @Param        id   path      string  true  "Project ID"
-// @Success      200  {boolean} true    "Proponent added successfully"
-// @Failure      400  {object}  utils.ErrorResponse "ID not informed"
-// @Failure      404  {object}  utils.ErrorResponse "Project not found"
-// @Failure      500  {object}  utils.ErrorResponse "Internal server error"
+// @Param        id    path      string                  true  "Project ID"
+// @Param        body  body      []ProponentInput        true  "List of proponents"
+// @Success      200   {array}   uint                    "IDs of added proponents"
+// @Failure      400   {object}  utils.ErrorResponse     "ID not informed or invalid JSON"
+// @Failure      404   {object}  utils.ErrorResponse     "Project not found"
+// @Failure      500   {object}  utils.ErrorResponse     "Internal server error"
 // @Router       /project/{id}/add_proponent [post]
 func (g *GlobalParams) AddProponent(w http.ResponseWriter, r *http.Request) {
 	id := chi.URLParam(r, "id")
@@ -169,29 +175,43 @@ func (g *GlobalParams) AddProponent(w http.ResponseWriter, r *http.Request) {
 	}
 
 	var project models.Project
-	g.db.Preload("Locations").Preload("Activities").First(&project, "id = ?", id)
-
-	var body struct {
-		ProponentID uint   `json:"proponentId"`
-		Role        string `json:"role"`
+	if err := g.db.Preload("Locations").Preload("Activities").First(&project, "id = ?", id).Error; err != nil {
+		utils.RespondError(w, http.StatusNotFound, "Project not found", err)
+		return
 	}
+
+	var body []ProponentInput
+
 	if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
 		utils.RespondError(w, http.StatusBadRequest, "Invalid JSON", err)
 		return
 	}
 
-	projectProponent := models.ProjectProponent{
-		ProponentID: body.ProponentID,
-		ProjectID:   project.ID,
-		Role:        body.Role,
-	}
-
-	if err := g.db.Create(&projectProponent).Error; err != nil {
-		utils.RespondError(w, http.StatusInternalServerError, "Failed to add proponent", err)
+	if len(body) == 0 {
+		utils.RespondError(w, http.StatusBadRequest, "No proponents provided", nil)
 		return
 	}
 
-	utils.RespondJSON(w, http.StatusOK, projectProponent.ID)
+	proponents := make([]models.ProjectProponent, len(body))
+	for i, p := range body {
+		proponents[i] = models.ProjectProponent{
+			ProponentID: p.ProponentID,
+			ProjectID:   project.ID,
+			Role:        p.Role,
+		}
+	}
+
+	if err := g.db.Create(&proponents).Error; err != nil {
+		utils.RespondError(w, http.StatusInternalServerError, "Failed to add proponents", err)
+		return
+	}
+
+	ids := make([]uint, len(proponents))
+	for i, p := range proponents {
+		ids[i] = p.ID
+	}
+
+	utils.RespondJSON(w, http.StatusOK, ids)
 }
 
 // @Summary      Remove Proponent

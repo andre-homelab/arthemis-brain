@@ -1,13 +1,12 @@
 package handlers
 
 import (
+	"arthemis-brain/internal/models"
+	"arthemis-brain/internal/utils"
 	"encoding/json"
 	"errors"
 	"log/slog"
 	"net/http"
-
-	"arthemis-brain/internal/models"
-	"arthemis-brain/internal/utils"
 
 	"github.com/go-chi/chi/v5"
 	"gorm.io/gorm"
@@ -128,7 +127,7 @@ func (g *GlobalParams) GetActivity(w http.ResponseWriter, r *http.Request) {
 // @Produce      json
 // @Param        id    path     string  true   "Activity ID"
 // @Param        project  body      models.Activity  true   "Activity details to update"
-// @Success      200  {object}  models.Activty    "Activity updated successfully"
+// @Success      200  {object}  models.Activity    "Activity updated successfully"
 // @Failure      400  {object}  utils.ErrorResponse "ID not informed"
 // @Failure      404  {object}  utils.ErrorResponse "Activity not found"
 // @Failure      500  {object}  utils.ErrorResponse "Internal server error"
