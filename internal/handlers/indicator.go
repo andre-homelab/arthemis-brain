@@ -1,12 +1,13 @@
 package handlers
 
 import (
-	"arthemis-brain/internal/models"
-	"arthemis-brain/internal/utils"
 	"encoding/json"
 	"errors"
 	"log/slog"
 	"net/http"
+
+	"arthemis-brain/internal/models"
+	"arthemis-brain/internal/utils"
 
 	"github.com/go-chi/chi/v5"
 	"gorm.io/gorm"
@@ -68,7 +69,7 @@ func (g *GlobalParams) GetIndicator(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	var indicator models.Proponent
+	var indicator models.Indicator
 	res := g.db.Preload("Observations").First(&indicator, "id = ?", id)
 	if res.Error != nil {
 		if errors.Is(res.Error, gorm.ErrRecordNotFound) {
@@ -87,8 +88,8 @@ func (g *GlobalParams) GetIndicator(w http.ResponseWriter, r *http.Request) {
 // @Tags         indicator
 // @Produce      json
 // @Param        id    path     string  true   "Indicator ID"
-// @Param        project  body      models.Location  true   "Indicator details to update"
-// @Success      200  {object}  models.Location    "Indicator updated successfully"
+// @Param        project  body      models.Indicator  true   "Indicator details to update"
+// @Success      200  {object}  models.Indicator    "Indicator updated successfully"
 // @Failure      400  {object}  utils.ErrorResponse "ID not informed"
 // @Failure      404  {object}  utils.ErrorResponse "Indicator not found"
 // @Failure      500  {object}  utils.ErrorResponse "Internal server error"
@@ -111,7 +112,7 @@ func (g *GlobalParams) UpdateIndicator(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	var reqindicator models.Proponent
+	var reqindicator models.Indicator
 	if err := json.NewDecoder(r.Body).Decode(&reqindicator); err != nil {
 		utils.RespondError(w, http.StatusBadRequest, "Invalid JSON", err)
 		return

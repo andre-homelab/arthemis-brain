@@ -1,12 +1,13 @@
 package handlers
 
 import (
-	"arthemis-brain/internal/models"
-	"arthemis-brain/internal/utils"
 	"encoding/json"
 	"errors"
 	"log/slog"
 	"net/http"
+
+	"arthemis-brain/internal/models"
+	"arthemis-brain/internal/utils"
 
 	"github.com/go-chi/chi/v5"
 	"gorm.io/gorm"
@@ -17,11 +18,11 @@ func ActivityHandler(logger *slog.Logger, db *gorm.DB) *GlobalParams {
 }
 
 type CreateActivityRequest struct {
-	ProjectID     uint   `json:"project_id"`
-	Name          string `json:"name"`
-	Description   string `json:"description"`
-	Justification string `json:"justification"`
-	LocationIDs   []uint `json:"location_ids"`
+	ProjectID     uint
+	Name          string
+	Description   string
+	Justification string
+	LocationIDs   []uint
 }
 
 // @Summary      Create Activity

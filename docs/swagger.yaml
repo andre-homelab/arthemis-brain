@@ -448,7 +448,7 @@ paths:
             $ref: '#/definitions/utils.ErrorResponse'
       summary: Delete Indicator
       tags:
-      - location
+      - indicator
   /indicator/update/{id}:
     put:
       description: Updates a indicator
@@ -463,14 +463,14 @@ paths:
         name: project
         required: true
         schema:
-          $ref: '#/definitions/models.Location'
+          $ref: '#/definitions/models.Indicator'
       produces:
       - application/json
       responses:
         "200":
           description: Indicator updated successfully
           schema:
-            $ref: '#/definitions/models.Location'
+            $ref: '#/definitions/models.Indicator'
         "400":
           description: ID not informed
           schema:

@@ -298,7 +298,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "location"
+                    "indicator"
                 ],
                 "summary": "Delete Indicator",
                 "parameters": [
@@ -362,7 +362,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/models.Location"
+                            "$ref": "#/definitions/models.Indicator"
                         }
                     }
                 ],
@@ -370,7 +370,7 @@ const docTemplate = `{
                     "200": {
                         "description": "Indicator updated successfully",
                         "schema": {
-                            "$ref": "#/definitions/models.Location"
+                            "$ref": "#/definitions/models.Indicator"
                         }
                     },
                     "400": {

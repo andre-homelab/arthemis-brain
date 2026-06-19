@@ -69,8 +69,8 @@ func (g *GlobalParams) GetObservation(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	var observation models.Proponent
-	res := g.db.Preload("Observations").First(&observation, "id = ?", id)
+	var observation models.Observation
+	res := g.db.First(&observation, "id = ?", id)
 	if res.Error != nil {
 		if errors.Is(res.Error, gorm.ErrRecordNotFound) {
 			utils.RespondError(w, http.StatusNotFound, "observation not found", res.Error)
@@ -112,7 +112,7 @@ func (g *GlobalParams) UpdateObservation(w http.ResponseWriter, r *http.Request)
 		return
 	}
 
-	var reqobservation models.Proponent
+	var reqobservation models.Observation
 	if err := json.NewDecoder(r.Body).Decode(&reqobservation); err != nil {
 		utils.RespondError(w, http.StatusBadRequest, "Invalid JSON", err)
 		return
