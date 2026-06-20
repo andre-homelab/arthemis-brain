@@ -5,7 +5,7 @@ import "slices"
 var rolesMap = map[string][]string{
 	"visitor": {"/"},
 	"manager": {"/", "/health"},
-	"admin":   {"/", "/health"},
+	"admin":   {"/", "/health", "/swagger"},
 }
 
 func GetRoles() map[string][]string {
