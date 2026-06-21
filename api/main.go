@@ -43,7 +43,6 @@ func main() {
 		logger.Error("Error initializing database!")
 	}
 
-	// Configuração da Auditoria (com url do watcher configurável via env)
 	watcherURL := env.GetEnv("WATCHER_URL", "http://localhost:8082")
 	watcherClient := audit.NewWatcherClient(watcherURL)
 	auditMiddleware := audit.AuditMiddleware(watcherClient)

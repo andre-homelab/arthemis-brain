@@ -45,4 +45,5 @@ volumes:
 
 networks:
   arthemis-edge:
-    driver: bridge
+    name: arthemis-edge
+    external: true
