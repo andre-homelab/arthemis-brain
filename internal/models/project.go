@@ -16,4 +16,5 @@ type Project struct {
 	Locations         []Location
 	Activities        []Activity
 	ProjectProponents []ProjectProponent
+	ProjectSdgs       []ProjectSdg
 }

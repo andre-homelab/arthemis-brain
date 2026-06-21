@@ -1387,6 +1387,231 @@ const docTemplate = `{
                     }
                 }
             }
+        },
+        "/sdg/": {
+            "get": {
+                "description": "Retrieves every sdg",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "sdg"
+                ],
+                "summary": "Gets all Sdgs",
+                "responses": {
+                    "200": {
+                        "description": "Sdg deleted successfully",
+                        "schema": {
+                            "type": "boolean"
+                        }
+                    },
+                    "404": {
+                        "description": "Sdg not found",
+                        "schema": {
+                            "$ref": "#/definitions/utils.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "$ref": "#/definitions/utils.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/sdg/create": {
+            "post": {
+                "description": "Creates a new sdg",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "sdg"
+                ],
+                "summary": "Create Sdg",
+                "parameters": [
+                    {
+                        "description": "Sdg details",
+                        "name": "sdg",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.Sdg"
+                        }
+                    }
+                ],
+                "responses": {
+                    "202": {
+                        "description": "Sdg created successfully",
+                        "schema": {
+                            "type": "boolean"
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid JSON or bad request",
+                        "schema": {
+                            "$ref": "#/definitions/utils.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/sdg/delete/{id}": {
+            "delete": {
+                "description": "Deletes a sdg by ID",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "sdg"
+                ],
+                "summary": "Delete Sdg",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Sdg ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Sdg deleted successfully",
+                        "schema": {
+                            "type": "boolean"
+                        }
+                    },
+                    "400": {
+                        "description": "SdgID not found",
+                        "schema": {
+                            "$ref": "#/definitions/utils.ErrorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Sdg not found",
+                        "schema": {
+                            "$ref": "#/definitions/utils.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "$ref": "#/definitions/utils.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/sdg/update/{id}": {
+            "patch": {
+                "description": "Updates an existing sdg by ID",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "sdg"
+                ],
+                "summary": "Update Sdg",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Sdg ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Sdg details to update",
+                        "name": "sdg",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.Sdg"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/models.Sdg"
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid JSON or SdgID not found",
+                        "schema": {
+                            "$ref": "#/definitions/utils.ErrorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Sdg not found",
+                        "schema": {
+                            "$ref": "#/definitions/utils.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "$ref": "#/definitions/utils.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/sdg/{id}": {
+            "get": {
+                "description": "Retrieves a sdg by ID",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "sdg"
+                ],
+                "summary": "Get Sdg",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Sdg ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/models.Sdg"
+                        }
+                    },
+                    "400": {
+                        "description": "SdgID not found",
+                        "schema": {
+                            "$ref": "#/definitions/utils.ErrorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Sdg not found",
+                        "schema": {
+                            "$ref": "#/definitions/utils.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "$ref": "#/definitions/utils.ErrorResponse"
+                        }
+                    }
+                }
+            }
         }
     },
     "definitions": {
@@ -1614,6 +1839,12 @@ const docTemplate = `{
                         "$ref": "#/definitions/models.ProjectProponent"
                     }
                 },
+                "projectSdgs": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/models.ProjectSdg"
+                    }
+                },
                 "proponentID": {
                     "type": "integer"
                 },
@@ -1648,6 +1879,29 @@ const docTemplate = `{
                 }
             }
         },
+        "models.ProjectSdg": {
+            "type": "object",
+            "properties": {
+                "createdAt": {
+                    "type": "string"
+                },
+                "deletedAt": {
+                    "$ref": "#/definitions/gorm.DeletedAt"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "projectID": {
+                    "type": "integer"
+                },
+                "sdgID": {
+                    "type": "integer"
+                },
+                "updatedAt": {
+                    "type": "string"
+                }
+            }
+        },
         "models.Proponent": {
             "type": "object",
             "properties": {
@@ -1671,6 +1925,32 @@ const docTemplate = `{
                     "items": {
                         "$ref": "#/definitions/models.Project"
                     }
+                },
+                "updatedAt": {
+                    "type": "string"
+                }
+            }
+        },
+        "models.Sdg": {
+            "type": "object",
+            "properties": {
+                "createdAt": {
+                    "type": "string"
+                },
+                "deletedAt": {
+                    "$ref": "#/definitions/gorm.DeletedAt"
+                },
+                "iconURL": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "number": {
+                    "type": "integer"
                 },
                 "updatedAt": {
                     "type": "string"
