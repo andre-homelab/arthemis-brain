@@ -1,7 +1,7 @@
 services:
   app:
     container_name: arthemis-brain
-    build: 
+    build:
       context: .
       dockerfile: Dockerfile
     image: go-api
@@ -20,6 +20,7 @@ services:
       arthemis-edge:
         aliases:
           - brain
+      brain-internal: {}
   postgres:
     image: postgres:16
     container_name: arthemis-brain-postgres
@@ -33,8 +34,8 @@ services:
     volumes:
       - postgres_data:/var/lib/postgresql/data
     networks:
-      - arthemis-edge
-    healthcheck:  
+      - brain-internal
+    healthcheck:
       test: ["CMD-SHELL", "pg_isready -U app_user -d app_db"]
       interval: 10s
       timeout: 5s

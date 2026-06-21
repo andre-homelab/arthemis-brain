@@ -23,9 +23,10 @@ func (j *JSONB) Scan(value any) error {
 
 type Location struct {
 	gorm.Model
-	ProjectID uint    `gorm:"uniqueIndex"`
-	Ecosystem string  `gorm:"type:varchar(100)"`
-	Extent    float32 `gorm:"type:decimal"`
-	Country   string  `gorm:"type:varchar(100)"`
-	Position  JSONB   `gorm:"type:jsonb"`
+	ProjectID  uint
+	Ecosystem  string  `gorm:"type:varchar(100)"`
+	Extent     float32 `gorm:"type:decimal"`
+	Country    string  `gorm:"type:varchar(100)"`
+	Position   JSONB   `gorm:"type:jsonb"`
+	Indicators []Indicator
 }
