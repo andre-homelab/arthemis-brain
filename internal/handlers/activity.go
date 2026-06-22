@@ -166,7 +166,7 @@ func (g *GlobalParams) UpdateActivity(w http.ResponseWriter, r *http.Request) {
 	locationIDs := reqActivity.LocationIDs
 
 	activity.ID = existing.ID
-	res = g.db.Model(&existing).Omit("Locations").Updates(&reqActivity)
+	res = g.db.Model(&existing).Omit("Locations").Updates(&activity)
 	if res.Error != nil {
 		utils.RespondError(w, http.StatusInternalServerError, "Error updating activity", res.Error)
 		return

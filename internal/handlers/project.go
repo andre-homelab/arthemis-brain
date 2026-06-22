@@ -140,7 +140,7 @@ func (g *GlobalParams) UpdateProject(w http.ResponseWriter, r *http.Request) {
 	sdgIds := reqProject.SdgIDs
 
 	project.ID = existing.ID
-	res = g.db.Model(&existing).Omit("ProjectSdgs").Updates(&reqProject)
+	res = g.db.Model(&existing).Omit("ProjectSdgs").Updates(&project)
 	if res.Error != nil {
 		utils.RespondError(w, http.StatusInternalServerError, "Erro ao atualizar o projecte", res.Error)
 		return
