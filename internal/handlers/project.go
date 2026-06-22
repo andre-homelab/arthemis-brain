@@ -1,12 +1,13 @@
 package handlers
 
 import (
-	"arthemis-brain/internal/models"
-	"arthemis-brain/internal/utils"
 	"encoding/json"
 	"errors"
 	"log/slog"
 	"net/http"
+
+	"arthemis-brain/internal/models"
+	"arthemis-brain/internal/utils"
 
 	"github.com/go-chi/chi/v5"
 	"gorm.io/gorm"
@@ -21,7 +22,7 @@ func ProjectHandler(logger *slog.Logger, db *gorm.DB) *GlobalParams {
 // @Tags         project
 // @Accept       json
 // @Produce      json
-// @Param        project  body      models.Project  true   "Project details"
+// @Param        project  body      models.ProjectRequest  true   "Project details"
 // @Success      202      {boolean} true            "Project created successfully"
 // @Failure      400      {object}  utils.ErrorResponse "Invalid JSON or bad request"
 // @Failure      401      {object}  utils.ErrorResponse "Unauthorized: proponent_id context missing"
@@ -61,7 +62,7 @@ func (g *GlobalParams) GetProject(w http.ResponseWriter, r *http.Request) {
 	}
 
 	var project models.Project
-	res := g.db.Preload("Locations").Preload("Activities").Preload("ProjectProponents").First(&project, "id = ?", id)
+	res := g.db.Preload("Locations").Preload("Activities").Preload("ProjectProponents").Preload("ProjectSdgs").First(&project, "id = ?", id)
 	if res.Error != nil {
 		if errors.Is(res.Error, gorm.ErrRecordNotFound) {
 			utils.RespondError(w, http.StatusNotFound, "Project not found", res.Error)
@@ -80,7 +81,7 @@ func (g *GlobalParams) GetProject(w http.ResponseWriter, r *http.Request) {
 // @Accept       json
 // @Produce      json
 // @Param        id       path      string          true   "Project ID"
-// @Param        project  body      models.Project  true   "Project details to update"
+// @Param        project  body      models.ProjectRequest  true   "Project details to update"
 // @Success      200      {object}  models.Project
 // @Failure      400      {object}  utils.ErrorResponse "Invalid JSON or ProjectID not received"
 // @Failure      404      {object}  utils.ErrorResponse "Project not found"
@@ -280,7 +281,7 @@ func (g *GlobalParams) AddSdgs(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	var body []ProponentInput
+	var body []SdgInput
 
 	if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
 		utils.RespondError(w, http.StatusBadRequest, "Invalid JSON", err)
@@ -288,20 +289,20 @@ func (g *GlobalParams) AddSdgs(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if len(body) == 0 {
-		utils.RespondError(w, http.StatusBadRequest, "No proponents provided", nil)
+		utils.RespondError(w, http.StatusBadRequest, "No sdgs provided", nil)
 		return
 	}
 
 	sdgs := make([]models.ProjectSdg, len(body))
 	for i, s := range body {
 		sdgs[i] = models.ProjectSdg{
-			SdgID:     s.ProponentID,
+			SdgID:     s.SdgID,
 			ProjectID: project.ID,
 		}
 	}
 
 	if err := g.db.Create(&sdgs).Error; err != nil {
-		utils.RespondError(w, http.StatusInternalServerError, "Failed to add proponents", err)
+		utils.RespondError(w, http.StatusInternalServerError, "Failed to add sdgs", err)
 		return
 	}
 
@@ -340,9 +341,9 @@ func (g *GlobalParams) RemoveSdg(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if err := g.db.Where("project_id = ? AND proponent_id = ?", projectID, sdgID).
+	if err := g.db.Where("project_id = ? AND sdg_id = ?", projectID, sdgID).
 		Delete(&models.ProjectProponent{}).Error; err != nil {
-		utils.RespondError(w, http.StatusInternalServerError, "Failed to remove proponent", err)
+		utils.RespondError(w, http.StatusInternalServerError, "Failed to remove sdg", err)
 		return
 	}
 

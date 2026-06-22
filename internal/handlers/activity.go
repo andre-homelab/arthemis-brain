@@ -29,7 +29,7 @@ type CreateActivityRequest struct {
 // @Description  Creates an activity
 // @Tags         activity
 // @Produce      json
-// @Param        activity  body []models.Activity  true   "Activity details"
+// @Param        activity  body []models.ActivityRequest  true   "Activity details"
 // @Success      200  {array}   uint  "Activity created"
 // @Failure      400  {object}  utils.ErrorResponse "No activities provided"
 // @Failure      500  {object}  utils.ErrorResponse "Internal server error"
@@ -127,7 +127,7 @@ func (g *GlobalParams) GetActivity(w http.ResponseWriter, r *http.Request) {
 // @Tags         activity
 // @Produce      json
 // @Param        id    path     string  true   "Activity ID"
-// @Param        project  body      models.Activity  true   "Activity details to update"
+// @Param        project  body      models.ActivityRequest  true   "Activity details to update"
 // @Success      200  {object}  models.Activity    "Activity updated successfully"
 // @Failure      400  {object}  utils.ErrorResponse "ID not informed"
 // @Failure      404  {object}  utils.ErrorResponse "Activity not found"

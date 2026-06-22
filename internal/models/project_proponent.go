@@ -8,3 +8,9 @@ type ProjectProponent struct {
 	ProjectID   uint
 	Role        string `gorm:"type:varchar(50)"`
 }
+
+type ProjectProponentRequest struct {
+	ProponentID uint
+	ProjectID   uint
+	Role        string
+}

@@ -21,7 +21,7 @@ func IndicatorHandler(logger *slog.Logger, db *gorm.DB) *GlobalParams {
 // @Description  Creates multiple indicators
 // @Tags         indicator
 // @Produce      json
-// @Param        indicators  body      []models.Indicator  true   "List of indicator details"
+// @Param        indicators  body      []models.IndicatorRequest  true   "List of indicator details"
 // @Success      202  {array}   uint                "IDs of created indicators"
 // @Failure      400  {object}  utils.ErrorResponse "Invalid request body"
 // @Failure      500  {object}  utils.ErrorResponse "Internal server error"
@@ -88,7 +88,7 @@ func (g *GlobalParams) GetIndicator(w http.ResponseWriter, r *http.Request) {
 // @Tags         indicator
 // @Produce      json
 // @Param        id    path     string  true   "Indicator ID"
-// @Param        project  body      models.Indicator  true   "Indicator details to update"
+// @Param        project  body      models.IndicatorRequest  true   "Indicator details to update"
 // @Success      200  {object}  models.Indicator    "Indicator updated successfully"
 // @Failure      400  {object}  utils.ErrorResponse "ID not informed"
 // @Failure      404  {object}  utils.ErrorResponse "Indicator not found"

@@ -7,3 +7,8 @@ type ProjectSdg struct {
 	ProjectID uint
 	SdgID     uint
 }
+
+type ProjectSdgRequest struct {
+	ProjectID uint
+	SdgID     uint
+}

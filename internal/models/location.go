@@ -30,3 +30,11 @@ type Location struct {
 	Position   JSONB   `gorm:"type:jsonb"`
 	Indicators []Indicator
 }
+
+type LocationRequest struct {
+	ProjectID uint
+	Ecosystem string
+	Extent    float32
+	Country   string
+	Position  JSONB
+}

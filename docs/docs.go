@@ -39,7 +39,7 @@ const docTemplate = `{
                         "schema": {
                             "type": "array",
                             "items": {
-                                "$ref": "#/definitions/models.Activity"
+                                "$ref": "#/definitions/models.ActivityRequest"
                             }
                         }
                     }
@@ -140,7 +140,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/models.Activity"
+                            "$ref": "#/definitions/models.ActivityRequest"
                         }
                     }
                 ],
@@ -261,7 +261,7 @@ const docTemplate = `{
                         "schema": {
                             "type": "array",
                             "items": {
-                                "$ref": "#/definitions/models.Indicator"
+                                "$ref": "#/definitions/models.IndicatorRequest"
                             }
                         }
                     }
@@ -362,7 +362,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/models.Indicator"
+                            "$ref": "#/definitions/models.IndicatorRequest"
                         }
                     }
                 ],
@@ -460,7 +460,7 @@ const docTemplate = `{
                         "schema": {
                             "type": "array",
                             "items": {
-                                "$ref": "#/definitions/models.Location"
+                                "$ref": "#/definitions/models.LocationRequest"
                             }
                         }
                     }
@@ -561,7 +561,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/models.Location"
+                            "$ref": "#/definitions/models.LocationRequest"
                         }
                     }
                 ],
@@ -659,7 +659,7 @@ const docTemplate = `{
                         "schema": {
                             "type": "array",
                             "items": {
-                                "$ref": "#/definitions/models.Observation"
+                                "$ref": "#/definitions/models.ObservationRequest"
                             }
                         }
                     }
@@ -760,7 +760,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/models.Location"
+                            "$ref": "#/definitions/models.LocationRequest"
                         }
                     }
                 ],
@@ -859,7 +859,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/models.Project"
+                            "$ref": "#/definitions/models.ProjectRequest"
                         }
                     }
                 ],
@@ -965,7 +965,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/models.Project"
+                            "$ref": "#/definitions/models.ProjectRequest"
                         }
                     }
                 ],
@@ -1109,6 +1109,71 @@ const docTemplate = `{
                 }
             }
         },
+        "/project/{id}/add_sdg": {
+            "post": {
+                "description": "Adds multiple sdgs to a project by ID",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "project"
+                ],
+                "summary": "Add Sdgs",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Project ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "List of proponents",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/handlers.SdgInput"
+                            }
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "IDs of added proponents",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "type": "integer"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "ID not informed or invalid JSON",
+                        "schema": {
+                            "$ref": "#/definitions/utils.ErrorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Project not found",
+                        "schema": {
+                            "$ref": "#/definitions/utils.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "$ref": "#/definitions/utils.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
         "/project/{projectId}/remove_proponent/{proponentId}": {
             "delete": {
                 "description": "Removes proponent from a project by ID",
@@ -1129,8 +1194,62 @@ const docTemplate = `{
                     },
                     {
                         "type": "string",
-                        "description": "Project ID",
+                        "description": "Proponent ID",
                         "name": "proponentId",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Proponent removed successfully",
+                        "schema": {
+                            "type": "boolean"
+                        }
+                    },
+                    "400": {
+                        "description": "ID not informed",
+                        "schema": {
+                            "$ref": "#/definitions/utils.ErrorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Project not found",
+                        "schema": {
+                            "$ref": "#/definitions/utils.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "$ref": "#/definitions/utils.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/project/{projectId}/remove_sdg/{sdgId}": {
+            "delete": {
+                "description": "Removes sdg from a project by ID",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "project"
+                ],
+                "summary": "Remove Sdg",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Project ID",
+                        "name": "projectId",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Sdg ID",
+                        "name": "sdgId",
                         "in": "path",
                         "required": true
                     }
@@ -1215,7 +1334,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/models.Proponent"
+                            "$ref": "#/definitions/models.ProponentRequest"
                         }
                     }
                 ],
@@ -1309,7 +1428,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/models.Proponent"
+                            "$ref": "#/definitions/models.ProponentRequest"
                         }
                     }
                 ],
@@ -1440,7 +1559,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/models.Sdg"
+                            "$ref": "#/definitions/models.SdgRequest"
                         }
                     }
                 ],
@@ -1534,7 +1653,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/models.Sdg"
+                            "$ref": "#/definitions/models.SdgRequest"
                         }
                     }
                 ],
@@ -1638,6 +1757,17 @@ const docTemplate = `{
                 }
             }
         },
+        "handlers.SdgInput": {
+            "type": "object",
+            "properties": {
+                "role": {
+                    "type": "string"
+                },
+                "sdgId": {
+                    "type": "integer"
+                }
+            }
+        },
         "models.Activity": {
             "type": "object",
             "properties": {
@@ -1676,6 +1806,23 @@ const docTemplate = `{
                 },
                 "updatedAt": {
                     "type": "string"
+                }
+            }
+        },
+        "models.ActivityRequest": {
+            "type": "object",
+            "properties": {
+                "description": {
+                    "type": "string"
+                },
+                "justification": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "projectID": {
+                    "type": "integer"
                 }
             }
         },
@@ -1726,6 +1873,37 @@ const docTemplate = `{
                 }
             }
         },
+        "models.IndicatorRequest": {
+            "type": "object",
+            "properties": {
+                "activityID": {
+                    "type": "integer"
+                },
+                "justification": {
+                    "type": "string"
+                },
+                "locationID": {
+                    "type": "integer"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "observationMethod": {
+                    "type": "string"
+                },
+                "unit": {
+                    "type": "string"
+                },
+                "valueBaseline": {
+                    "type": "number",
+                    "format": "float32"
+                },
+                "valueReference": {
+                    "type": "number",
+                    "format": "float32"
+                }
+            }
+        },
         "models.JSONB": {
             "type": "object",
             "additionalProperties": {}
@@ -1768,6 +1946,27 @@ const docTemplate = `{
                 }
             }
         },
+        "models.LocationRequest": {
+            "type": "object",
+            "properties": {
+                "country": {
+                    "type": "string"
+                },
+                "ecosystem": {
+                    "type": "string"
+                },
+                "extent": {
+                    "type": "number",
+                    "format": "float32"
+                },
+                "position": {
+                    "$ref": "#/definitions/models.JSONB"
+                },
+                "projectID": {
+                    "type": "integer"
+                }
+            }
+        },
         "models.Observation": {
             "type": "object",
             "properties": {
@@ -1794,6 +1993,24 @@ const docTemplate = `{
                 },
                 "value": {
                     "type": "number"
+                }
+            }
+        },
+        "models.ObservationRequest": {
+            "type": "object",
+            "properties": {
+                "date": {
+                    "type": "string"
+                },
+                "indicatorID": {
+                    "type": "integer"
+                },
+                "position": {
+                    "$ref": "#/definitions/models.JSONB"
+                },
+                "value": {
+                    "type": "number",
+                    "format": "float32"
                 }
             }
         },
@@ -1879,6 +2096,26 @@ const docTemplate = `{
                 }
             }
         },
+        "models.ProjectRequest": {
+            "type": "object",
+            "properties": {
+                "justification": {
+                    "type": "string"
+                },
+                "lifetimeEnd": {
+                    "type": "string"
+                },
+                "lifetimeStart": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "proponentID": {
+                    "type": "integer"
+                }
+            }
+        },
         "models.ProjectSdg": {
             "type": "object",
             "properties": {
@@ -1931,6 +2168,17 @@ const docTemplate = `{
                 }
             }
         },
+        "models.ProponentRequest": {
+            "type": "object",
+            "properties": {
+                "email": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                }
+            }
+        },
         "models.Sdg": {
             "type": "object",
             "properties": {
@@ -1954,6 +2202,20 @@ const docTemplate = `{
                 },
                 "updatedAt": {
                     "type": "string"
+                }
+            }
+        },
+        "models.SdgRequest": {
+            "type": "object",
+            "properties": {
+                "iconURL": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "number": {
+                    "type": "integer"
                 }
             }
         },

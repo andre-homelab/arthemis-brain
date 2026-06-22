@@ -18,3 +18,11 @@ type Project struct {
 	ProjectProponents []ProjectProponent
 	ProjectSdgs       []ProjectSdg
 }
+
+type ProjectRequest struct {
+	ProponentID   uint
+	Name          string
+	LifetimeStart time.Time
+	LifetimeEnd   time.Time
+	Justification string
+}
