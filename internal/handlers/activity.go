@@ -1,12 +1,13 @@
 package handlers
 
 import (
-	"arthemis-brain/internal/models"
-	"arthemis-brain/internal/utils"
 	"encoding/json"
 	"errors"
 	"log/slog"
 	"net/http"
+
+	"arthemis-brain/internal/models"
+	"arthemis-brain/internal/utils"
 
 	"github.com/go-chi/chi/v5"
 	"gorm.io/gorm"
@@ -150,20 +151,38 @@ func (g *GlobalParams) UpdateActivity(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	var reqActivity models.Activity
+	var reqActivity models.ActivityRequest
 	if err := json.NewDecoder(r.Body).Decode(&reqActivity); err != nil {
 		utils.RespondError(w, http.StatusBadRequest, "Invalid JSON", err)
 		return
 	}
 
-	reqActivity.ID = existing.ID
-	res = g.db.Model(&existing).Updates(&reqActivity)
+	activity := models.Activity{
+		ProjectID:     reqActivity.ProjectID,
+		Name:          reqActivity.Name,
+		Description:   reqActivity.Description,
+		Justification: reqActivity.Justification,
+	}
+	locationIDs := reqActivity.LocationIDs
+
+	activity.ID = existing.ID
+	res = g.db.Model(&existing).Omit("Locations").Updates(&reqActivity)
 	if res.Error != nil {
 		utils.RespondError(w, http.StatusInternalServerError, "Error updating activity", res.Error)
 		return
 	}
 
-	utils.RespondJSON(w, http.StatusOK, reqActivity)
+	locations := make([]models.Location, len(locationIDs))
+	for j, id := range locationIDs {
+		locations[j] = models.Location{Model: gorm.Model{ID: id}}
+	}
+
+	if err := g.db.Model(&activity).Association("Locations").Replace(locations); err != nil {
+		utils.RespondError(w, http.StatusInternalServerError, "Error associating locations", err)
+		return
+	}
+
+	utils.RespondJSON(w, http.StatusOK, activity)
 }
 
 // @Summary      Delete Activity

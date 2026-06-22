@@ -16,7 +16,7 @@ type Project struct {
 	Locations         []Location
 	Activities        []Activity
 	ProjectProponents []ProjectProponent
-	ProjectSdgs       []ProjectSdg
+	ProjectSdgs       []Sdg `gorm:"many2many:project_sdg"`
 }
 
 type ProjectRequest struct {
@@ -25,4 +25,5 @@ type ProjectRequest struct {
 	LifetimeStart time.Time
 	LifetimeEnd   time.Time
 	Justification string
+	SdgIDs        []uint
 }

@@ -15,13 +15,6 @@ definitions:
       role:
         type: string
     type: object
-  handlers.SdgInput:
-    properties:
-      role:
-        type: string
-      sdgId:
-        type: integer
-    type: object
   models.Activity:
     properties:
       createdAt:
@@ -219,7 +212,7 @@ definitions:
         type: array
       projectSdgs:
         items:
-          $ref: '#/definitions/models.ProjectSdg'
+          $ref: '#/definitions/models.Sdg'
         type: array
       proponentID:
         type: integer
@@ -255,21 +248,10 @@ definitions:
         type: string
       proponentID:
         type: integer
-    type: object
-  models.ProjectSdg:
-    properties:
-      createdAt:
-        type: string
-      deletedAt:
-        $ref: '#/definitions/gorm.DeletedAt'
-      id:
-        type: integer
-      projectID:
-        type: integer
-      sdgID:
-        type: integer
-      updatedAt:
-        type: string
+      sdgIDs:
+        items:
+          type: integer
+        type: array
     type: object
   models.Proponent:
     properties:
@@ -956,49 +938,6 @@ paths:
       summary: Add Proponents
       tags:
       - project
-  /project/{id}/add_sdg:
-    post:
-      consumes:
-      - application/json
-      description: Adds multiple sdgs to a project by ID
-      parameters:
-      - description: Project ID
-        in: path
-        name: id
-        required: true
-        type: string
-      - description: List of proponents
-        in: body
-        name: body
-        required: true
-        schema:
-          items:
-            $ref: '#/definitions/handlers.SdgInput'
-          type: array
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: IDs of added proponents
-          schema:
-            items:
-              type: integer
-            type: array
-        "400":
-          description: ID not informed or invalid JSON
-          schema:
-            $ref: '#/definitions/utils.ErrorResponse'
-        "404":
-          description: Project not found
-          schema:
-            $ref: '#/definitions/utils.ErrorResponse'
-        "500":
-          description: Internal server error
-          schema:
-            $ref: '#/definitions/utils.ErrorResponse'
-      summary: Add Sdgs
-      tags:
-      - project
   /project/{projectId}/remove_proponent/{proponentId}:
     delete:
       description: Removes proponent from a project by ID
@@ -1033,42 +972,6 @@ paths:
           schema:
             $ref: '#/definitions/utils.ErrorResponse'
       summary: Remove Proponent
-      tags:
-      - project
-  /project/{projectId}/remove_sdg/{sdgId}:
-    delete:
-      description: Removes sdg from a project by ID
-      parameters:
-      - description: Project ID
-        in: path
-        name: projectId
-        required: true
-        type: string
-      - description: Sdg ID
-        in: path
-        name: sdgId
-        required: true
-        type: string
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: Proponent removed successfully
-          schema:
-            type: boolean
-        "400":
-          description: ID not informed
-          schema:
-            $ref: '#/definitions/utils.ErrorResponse'
-        "404":
-          description: Project not found
-          schema:
-            $ref: '#/definitions/utils.ErrorResponse'
-        "500":
-          description: Internal server error
-          schema:
-            $ref: '#/definitions/utils.ErrorResponse'
-      summary: Remove Sdg
       tags:
       - project
   /project/create:

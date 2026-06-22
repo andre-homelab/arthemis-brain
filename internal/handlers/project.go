@@ -29,19 +29,38 @@ func ProjectHandler(logger *slog.Logger, db *gorm.DB) *GlobalParams {
 // @Failure      409      {object}  utils.ErrorResponse "Proponent already has a project"
 // @Router       /project/create [post]
 func (g *GlobalParams) CreateProject(w http.ResponseWriter, r *http.Request) {
-	var reqProject models.Project
+	var reqProject models.ProjectRequest
 	if err := json.NewDecoder(r.Body).Decode(&reqProject); err != nil {
 		utils.RespondError(w, http.StatusBadRequest, "Invalid JSON", err)
 		return
 	}
 
-	res := g.db.Create(&reqProject)
+	project := models.Project{
+		ProponentID:   reqProject.ProponentID,
+		Name:          reqProject.Name,
+		LifetimeStart: reqProject.LifetimeStart,
+		LifetimeEnd:   reqProject.LifetimeEnd,
+		Justification: reqProject.Justification,
+	}
+	sdgIds := reqProject.SdgIDs
+
+	res := g.db.Omit("ProjectSdgs").Create(&project)
 	if res.Error != nil {
 		utils.RespondError(w, http.StatusBadRequest, "Error creating the project", res.Error)
 		return
 	}
 
-	utils.RespondJSON(w, http.StatusAccepted, reqProject.ID)
+	sdgs := make([]models.Sdg, len(sdgIds))
+	for i, id := range sdgIds {
+		sdgs[i] = models.Sdg{Model: gorm.Model{ID: id}}
+	}
+
+	if err := g.db.Model(&project).Association("ProjectSdgs").Replace(sdgs); err != nil {
+		utils.RespondError(w, http.StatusInternalServerError, "Error associating SDGs", err)
+		return
+	}
+
+	utils.RespondJSON(w, http.StatusAccepted, project.ID)
 }
 
 // @Summary      Get project
@@ -105,20 +124,39 @@ func (g *GlobalParams) UpdateProject(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	var reqProject models.Project
+	var reqProject models.ProjectRequest
 	if err := json.NewDecoder(r.Body).Decode(&reqProject); err != nil {
 		utils.RespondError(w, http.StatusBadRequest, "JSON inválido", err)
 		return
 	}
 
-	reqProject.ID = existing.ID
-	res = g.db.Model(&existing).Updates(&reqProject)
+	project := models.Project{
+		ProponentID:   reqProject.ProponentID,
+		Name:          reqProject.Name,
+		LifetimeStart: reqProject.LifetimeStart,
+		LifetimeEnd:   reqProject.LifetimeEnd,
+		Justification: reqProject.Justification,
+	}
+	sdgIds := reqProject.SdgIDs
+
+	project.ID = existing.ID
+	res = g.db.Model(&existing).Omit("ProjectSdgs").Updates(&reqProject)
 	if res.Error != nil {
 		utils.RespondError(w, http.StatusInternalServerError, "Erro ao atualizar o projecte", res.Error)
 		return
 	}
 
-	utils.RespondJSON(w, http.StatusOK, reqProject)
+	sdgs := make([]models.Sdg, len(sdgIds))
+	for i, id := range sdgIds {
+		sdgs[i] = models.Sdg{Model: gorm.Model{ID: id}}
+	}
+
+	if err := g.db.Model(&project).Association("ProjectSdgs").Replace(sdgs); err != nil {
+		utils.RespondError(w, http.StatusInternalServerError, "Error associating SDGs", err)
+		return
+	}
+
+	utils.RespondJSON(w, http.StatusOK, project)
 }
 
 // @Summary      Delete Project
@@ -245,105 +283,6 @@ func (g *GlobalParams) RemoveProponent(w http.ResponseWriter, r *http.Request) {
 	if err := g.db.Where("project_id = ? AND proponent_id = ?", projectID, proponentID).
 		Delete(&models.ProjectProponent{}).Error; err != nil {
 		utils.RespondError(w, http.StatusInternalServerError, "Failed to remove proponent", err)
-		return
-	}
-
-	utils.RespondJSON(w, http.StatusOK, true)
-}
-
-type SdgInput struct {
-	SdgID uint   `json:"sdgId"`
-	Role  string `json:"role"`
-}
-
-// @Summary      Add Sdgs
-// @Description  Adds multiple sdgs to a project by ID
-// @Tags         project
-// @Accept       json
-// @Produce      json
-// @Param        id    path      string                  true  "Project ID"
-// @Param        body  body      []SdgInput        true  "List of proponents"
-// @Success      200   {array}   uint                    "IDs of added proponents"
-// @Failure      400   {object}  utils.ErrorResponse     "ID not informed or invalid JSON"
-// @Failure      404   {object}  utils.ErrorResponse     "Project not found"
-// @Failure      500   {object}  utils.ErrorResponse     "Internal server error"
-// @Router       /project/{id}/add_sdg [post]
-func (g *GlobalParams) AddSdgs(w http.ResponseWriter, r *http.Request) {
-	id := chi.URLParam(r, "id")
-	if id == "" {
-		utils.RespondError(w, http.StatusBadRequest, "ID não informado", nil)
-		return
-	}
-
-	var project models.Project
-	if err := g.db.Preload("Locations").Preload("Activities").First(&project, "id = ?", id).Error; err != nil {
-		utils.RespondError(w, http.StatusNotFound, "Project not found", err)
-		return
-	}
-
-	var body []SdgInput
-
-	if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
-		utils.RespondError(w, http.StatusBadRequest, "Invalid JSON", err)
-		return
-	}
-
-	if len(body) == 0 {
-		utils.RespondError(w, http.StatusBadRequest, "No sdgs provided", nil)
-		return
-	}
-
-	sdgs := make([]models.ProjectSdg, len(body))
-	for i, s := range body {
-		sdgs[i] = models.ProjectSdg{
-			SdgID:     s.SdgID,
-			ProjectID: project.ID,
-		}
-	}
-
-	if err := g.db.Create(&sdgs).Error; err != nil {
-		utils.RespondError(w, http.StatusInternalServerError, "Failed to add sdgs", err)
-		return
-	}
-
-	ids := make([]uint, len(sdgs))
-	for i, p := range sdgs {
-		ids[i] = p.ID
-	}
-
-	utils.RespondJSON(w, http.StatusOK, ids)
-}
-
-// @Summary      Remove Sdg
-// @Description  Removes sdg from a project by ID
-// @Tags         project
-// @Produce      json
-// @Param        projectId   path      string  true  "Project ID"
-// @Param        sdgId   path      string  true  "Sdg ID"
-// @Success      200  {boolean} true    "Proponent removed successfully"
-// @Failure      400  {object}  utils.ErrorResponse "ID not informed"
-// @Failure      404  {object}  utils.ErrorResponse "Project not found"
-// @Failure      500  {object}  utils.ErrorResponse "Internal server error"
-// @Router       /project/{projectId}/remove_sdg/{sdgId} [delete]
-func (g *GlobalParams) RemoveSdg(w http.ResponseWriter, r *http.Request) {
-	projectID := chi.URLParam(r, "projectId")
-	if projectID == "" {
-		utils.RespondError(w, http.StatusBadRequest, "ID do projeto não informado", nil)
-		return
-	}
-
-	var project models.Project
-	g.db.First(&project, "id = ?", projectID)
-
-	sdgID := chi.URLParam(r, "sdgId")
-	if sdgID == "" {
-		utils.RespondError(w, http.StatusBadRequest, "ID do projeto não informado", nil)
-		return
-	}
-
-	if err := g.db.Where("project_id = ? AND sdg_id = ?", projectID, sdgID).
-		Delete(&models.ProjectProponent{}).Error; err != nil {
-		utils.RespondError(w, http.StatusInternalServerError, "Failed to remove sdg", err)
 		return
 	}
 

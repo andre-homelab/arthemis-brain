@@ -11,11 +11,12 @@
 package main
 
 import (
-	"arthemis-brain/internal/database"
-	"arthemis-brain/internal/handlers"
 	"log/slog"
 	"net/http"
 	"os"
+
+	"arthemis-brain/internal/database"
+	"arthemis-brain/internal/handlers"
 
 	_ "arthemis-brain/docs"
 
@@ -70,8 +71,6 @@ func main() {
 		r.Delete("/delete/{id}", projectHandler.DeleteProject)
 		r.Post("/{id}/add_proponent", projectHandler.AddProponent)
 		r.Delete("/{projectId}/remove_proponent/{proponentId}", projectHandler.RemoveProponent)
-		r.Post("/{id}/add_sdg", projectHandler.AddSdgs)
-		r.Delete("/{projectId}/remove_sdg/{sdgId}", projectHandler.RemoveSdg)
 	})
 
 	activityHandler := handlers.ActivityHandler(logger, db)

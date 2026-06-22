@@ -81,10 +81,6 @@ func ConnectToDatabase(logger *slog.Logger) (*gorm.DB, error) {
 		logger.Error("Error on AutoMigrate: Sdg")
 		return nil, err
 	}
-	if err := db.AutoMigrate(&models.ProjectSdg{}); err != nil {
-		logger.Error("Error on AutoMigrate: ProjectSdg")
-		return nil, err
-	}
 
 	return db, nil
 }

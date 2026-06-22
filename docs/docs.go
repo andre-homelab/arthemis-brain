@@ -1109,71 +1109,6 @@ const docTemplate = `{
                 }
             }
         },
-        "/project/{id}/add_sdg": {
-            "post": {
-                "description": "Adds multiple sdgs to a project by ID",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "project"
-                ],
-                "summary": "Add Sdgs",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "Project ID",
-                        "name": "id",
-                        "in": "path",
-                        "required": true
-                    },
-                    {
-                        "description": "List of proponents",
-                        "name": "body",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "type": "array",
-                            "items": {
-                                "$ref": "#/definitions/handlers.SdgInput"
-                            }
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "IDs of added proponents",
-                        "schema": {
-                            "type": "array",
-                            "items": {
-                                "type": "integer"
-                            }
-                        }
-                    },
-                    "400": {
-                        "description": "ID not informed or invalid JSON",
-                        "schema": {
-                            "$ref": "#/definitions/utils.ErrorResponse"
-                        }
-                    },
-                    "404": {
-                        "description": "Project not found",
-                        "schema": {
-                            "$ref": "#/definitions/utils.ErrorResponse"
-                        }
-                    },
-                    "500": {
-                        "description": "Internal server error",
-                        "schema": {
-                            "$ref": "#/definitions/utils.ErrorResponse"
-                        }
-                    }
-                }
-            }
-        },
         "/project/{projectId}/remove_proponent/{proponentId}": {
             "delete": {
                 "description": "Removes proponent from a project by ID",
@@ -1196,60 +1131,6 @@ const docTemplate = `{
                         "type": "string",
                         "description": "Proponent ID",
                         "name": "proponentId",
-                        "in": "path",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "Proponent removed successfully",
-                        "schema": {
-                            "type": "boolean"
-                        }
-                    },
-                    "400": {
-                        "description": "ID not informed",
-                        "schema": {
-                            "$ref": "#/definitions/utils.ErrorResponse"
-                        }
-                    },
-                    "404": {
-                        "description": "Project not found",
-                        "schema": {
-                            "$ref": "#/definitions/utils.ErrorResponse"
-                        }
-                    },
-                    "500": {
-                        "description": "Internal server error",
-                        "schema": {
-                            "$ref": "#/definitions/utils.ErrorResponse"
-                        }
-                    }
-                }
-            }
-        },
-        "/project/{projectId}/remove_sdg/{sdgId}": {
-            "delete": {
-                "description": "Removes sdg from a project by ID",
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "project"
-                ],
-                "summary": "Remove Sdg",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "Project ID",
-                        "name": "projectId",
-                        "in": "path",
-                        "required": true
-                    },
-                    {
-                        "type": "string",
-                        "description": "Sdg ID",
-                        "name": "sdgId",
                         "in": "path",
                         "required": true
                     }
@@ -1757,17 +1638,6 @@ const docTemplate = `{
                 }
             }
         },
-        "handlers.SdgInput": {
-            "type": "object",
-            "properties": {
-                "role": {
-                    "type": "string"
-                },
-                "sdgId": {
-                    "type": "integer"
-                }
-            }
-        },
         "models.Activity": {
             "type": "object",
             "properties": {
@@ -2065,7 +1935,7 @@ const docTemplate = `{
                 "projectSdgs": {
                     "type": "array",
                     "items": {
-                        "$ref": "#/definitions/models.ProjectSdg"
+                        "$ref": "#/definitions/models.Sdg"
                     }
                 },
                 "proponentID": {
@@ -2119,29 +1989,12 @@ const docTemplate = `{
                 },
                 "proponentID": {
                     "type": "integer"
-                }
-            }
-        },
-        "models.ProjectSdg": {
-            "type": "object",
-            "properties": {
-                "createdAt": {
-                    "type": "string"
                 },
-                "deletedAt": {
-                    "$ref": "#/definitions/gorm.DeletedAt"
-                },
-                "id": {
-                    "type": "integer"
-                },
-                "projectID": {
-                    "type": "integer"
-                },
-                "sdgID": {
-                    "type": "integer"
-                },
-                "updatedAt": {
-                    "type": "string"
+                "sdgIDs": {
+                    "type": "array",
+                    "items": {
+                        "type": "integer"
+                    }
                 }
             }
         },
