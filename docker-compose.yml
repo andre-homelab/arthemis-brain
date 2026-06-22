@@ -35,6 +35,7 @@ services:
       - postgres_data:/var/lib/postgresql/data
     networks:
       - brain-internal
+      - arthemis-edge
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U app_user -d app_db"]
       interval: 10s
