@@ -64,15 +64,6 @@ func main() {
 				logger.Error("Error")
 			}
 		})
-		projectHandler := handlers.ProjectHandler(logger, db)
-		r.Route("/project", func(r chi.Router) {
-			r.Post("/create", projectHandler.CreateProject)
-			r.Get("/{id}", projectHandler.GetProject)
-			r.Put("/update/{id}", projectHandler.UpdateProject)
-			r.Delete("/delete/{id}", projectHandler.DeleteProject)
-			r.Post("/{id}/add_proponent", projectHandler.AddProponent)
-			r.Delete("/{projectId}/remove_proponent/{proponentId}", projectHandler.RemoveProponent)
-		})
 
 		activityHandler := handlers.ActivityHandler(logger, db)
 		r.Route("/activity", func(r chi.Router) {

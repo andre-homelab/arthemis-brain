@@ -48,3 +48,5 @@ networks:
   arthemis-edge:
     name: arthemis-edge
     external: true
+  brain-internal:
+    driver: bridge
