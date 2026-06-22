@@ -19,4 +19,5 @@ type ActivityRequest struct {
 	Name          string
 	Description   string
 	Justification string
+	LocationIDs   []int
 }

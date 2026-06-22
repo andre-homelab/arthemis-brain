@@ -1,13 +1,12 @@
 package handlers
 
 import (
+	"arthemis-brain/internal/models"
+	"arthemis-brain/internal/utils"
 	"encoding/json"
 	"errors"
 	"log/slog"
 	"net/http"
-
-	"arthemis-brain/internal/models"
-	"arthemis-brain/internal/utils"
 
 	"github.com/go-chi/chi/v5"
 	"gorm.io/gorm"
@@ -109,7 +108,7 @@ func (g *GlobalParams) GetActivity(w http.ResponseWriter, r *http.Request) {
 	}
 
 	var activity models.Activity
-	res := g.db.Preload("Indicators").First(&activity, "id = ?", id)
+	res := g.db.Preload("Indicators").Preload("Locations").First(&activity, "id = ?", id)
 	if res.Error != nil {
 		if errors.Is(res.Error, gorm.ErrRecordNotFound) {
 			utils.RespondError(w, http.StatusNotFound, "Activity not found", res.Error)

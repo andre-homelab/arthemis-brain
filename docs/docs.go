@@ -1818,6 +1818,12 @@ const docTemplate = `{
                 "justification": {
                     "type": "string"
                 },
+                "locationIDs": {
+                    "type": "array",
+                    "items": {
+                        "type": "integer"
+                    }
+                },
                 "name": {
                     "type": "string"
                 },
