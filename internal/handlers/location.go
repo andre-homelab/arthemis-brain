@@ -21,7 +21,7 @@ func LocationHandler(logger *slog.Logger, db *gorm.DB) *GlobalParams {
 // @Description  Creates multiple locations
 // @Tags         location
 // @Produce      json
-// @Param        locations  body      []models.Location  true   "List of location details"
+// @Param        locations  body      []models.LocationRequest  true   "List of location details"
 // @Success      202  {array}   uint                "IDs of created locations"
 // @Failure      400  {object}  utils.ErrorResponse "Invalid request body"
 // @Failure      500  {object}  utils.ErrorResponse "Internal server error"
@@ -88,7 +88,7 @@ func (g *GlobalParams) GetLocation(w http.ResponseWriter, r *http.Request) {
 // @Tags         location
 // @Produce      json
 // @Param        id    path     string  true   "Location ID"
-// @Param        project  body      models.Location  true   "Location details to update"
+// @Param        project  body      models.LocationRequest  true   "Location details to update"
 // @Success      200  {object}  models.Location    "Location updated successfully"
 // @Failure      400  {object}  utils.ErrorResponse "ID not informed"
 // @Failure      404  {object}  utils.ErrorResponse "Location not found"

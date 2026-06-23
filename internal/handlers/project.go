@@ -1,12 +1,13 @@
 package handlers
 
 import (
-	"arthemis-brain/internal/models"
-	"arthemis-brain/internal/utils"
 	"encoding/json"
 	"errors"
 	"log/slog"
 	"net/http"
+
+	"arthemis-brain/internal/models"
+	"arthemis-brain/internal/utils"
 
 	"github.com/go-chi/chi/v5"
 	"gorm.io/gorm"
@@ -21,26 +22,45 @@ func ProjectHandler(logger *slog.Logger, db *gorm.DB) *GlobalParams {
 // @Tags         project
 // @Accept       json
 // @Produce      json
-// @Param        project  body      models.Project  true   "Project details"
+// @Param        project  body      models.ProjectRequest  true   "Project details"
 // @Success      202      {boolean} true            "Project created successfully"
 // @Failure      400      {object}  utils.ErrorResponse "Invalid JSON or bad request"
 // @Failure      401      {object}  utils.ErrorResponse "Unauthorized: proponent_id context missing"
 // @Failure      409      {object}  utils.ErrorResponse "Proponent already has a project"
 // @Router       /project/create [post]
 func (g *GlobalParams) CreateProject(w http.ResponseWriter, r *http.Request) {
-	var reqProject models.Project
+	var reqProject models.ProjectRequest
 	if err := json.NewDecoder(r.Body).Decode(&reqProject); err != nil {
 		utils.RespondError(w, http.StatusBadRequest, "Invalid JSON", err)
 		return
 	}
 
-	res := g.db.Create(&reqProject)
+	project := models.Project{
+		ProponentID:   reqProject.ProponentID,
+		Name:          reqProject.Name,
+		LifetimeStart: reqProject.LifetimeStart,
+		LifetimeEnd:   reqProject.LifetimeEnd,
+		Justification: reqProject.Justification,
+	}
+	sdgIds := reqProject.SdgIDs
+
+	res := g.db.Omit("ProjectSdgs").Create(&project)
 	if res.Error != nil {
 		utils.RespondError(w, http.StatusBadRequest, "Error creating the project", res.Error)
 		return
 	}
 
-	utils.RespondJSON(w, http.StatusAccepted, reqProject.ID)
+	sdgs := make([]models.Sdg, len(sdgIds))
+	for i, id := range sdgIds {
+		sdgs[i] = models.Sdg{Model: gorm.Model{ID: id}}
+	}
+
+	if err := g.db.Model(&project).Association("ProjectSdgs").Replace(sdgs); err != nil {
+		utils.RespondError(w, http.StatusInternalServerError, "Error associating SDGs", err)
+		return
+	}
+
+	utils.RespondJSON(w, http.StatusAccepted, project.ID)
 }
 
 // @Summary      Get project
@@ -61,7 +81,7 @@ func (g *GlobalParams) GetProject(w http.ResponseWriter, r *http.Request) {
 	}
 
 	var project models.Project
-	res := g.db.Preload("Locations").Preload("Activities").Preload("ProjectProponents").First(&project, "id = ?", id)
+	res := g.db.Preload("Locations").Preload("Activities").Preload("ProjectProponents").Preload("ProjectSdgs").First(&project, "id = ?", id)
 	if res.Error != nil {
 		if errors.Is(res.Error, gorm.ErrRecordNotFound) {
 			utils.RespondError(w, http.StatusNotFound, "Project not found", res.Error)
@@ -80,7 +100,7 @@ func (g *GlobalParams) GetProject(w http.ResponseWriter, r *http.Request) {
 // @Accept       json
 // @Produce      json
 // @Param        id       path      string          true   "Project ID"
-// @Param        project  body      models.Project  true   "Project details to update"
+// @Param        project  body      models.ProjectRequest  true   "Project details to update"
 // @Success      200      {object}  models.Project
 // @Failure      400      {object}  utils.ErrorResponse "Invalid JSON or ProjectID not received"
 // @Failure      404      {object}  utils.ErrorResponse "Project not found"
@@ -104,20 +124,39 @@ func (g *GlobalParams) UpdateProject(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	var reqProject models.Project
+	var reqProject models.ProjectRequest
 	if err := json.NewDecoder(r.Body).Decode(&reqProject); err != nil {
 		utils.RespondError(w, http.StatusBadRequest, "JSON inválido", err)
 		return
 	}
 
-	reqProject.ID = existing.ID
-	res = g.db.Model(&existing).Updates(&reqProject)
+	project := models.Project{
+		ProponentID:   reqProject.ProponentID,
+		Name:          reqProject.Name,
+		LifetimeStart: reqProject.LifetimeStart,
+		LifetimeEnd:   reqProject.LifetimeEnd,
+		Justification: reqProject.Justification,
+	}
+	sdgIds := reqProject.SdgIDs
+
+	project.ID = existing.ID
+	res = g.db.Model(&existing).Omit("ProjectSdgs").Updates(&project)
 	if res.Error != nil {
 		utils.RespondError(w, http.StatusInternalServerError, "Erro ao atualizar o projecte", res.Error)
 		return
 	}
 
-	utils.RespondJSON(w, http.StatusOK, reqProject)
+	sdgs := make([]models.Sdg, len(sdgIds))
+	for i, id := range sdgIds {
+		sdgs[i] = models.Sdg{Model: gorm.Model{ID: id}}
+	}
+
+	if err := g.db.Model(&project).Association("ProjectSdgs").Replace(sdgs); err != nil {
+		utils.RespondError(w, http.StatusInternalServerError, "Error associating SDGs", err)
+		return
+	}
+
+	utils.RespondJSON(w, http.StatusOK, project)
 }
 
 // @Summary      Delete Project
@@ -219,7 +258,7 @@ func (g *GlobalParams) AddProponent(w http.ResponseWriter, r *http.Request) {
 // @Tags         project
 // @Produce      json
 // @Param        projectId   path      string  true  "Project ID"
-// @Param        proponentId   path      string  true  "Project ID"
+// @Param        proponentId   path      string  true  "Proponent ID"
 // @Success      200  {boolean} true    "Proponent removed successfully"
 // @Failure      400  {object}  utils.ErrorResponse "ID not informed"
 // @Failure      404  {object}  utils.ErrorResponse "Project not found"
