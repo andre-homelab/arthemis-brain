@@ -93,6 +93,7 @@ func main() {
 	r.Route("/indicator", func(r chi.Router) {
 		r.Post("/create", indicatorHandler.CreateIndicator)
 		r.Get("/{id}", indicatorHandler.GetIndicator)
+		r.Get("/", indicatorHandler.GetAllIndicators)
 		r.Put("/update/{id}", indicatorHandler.UpdateIndicator)
 		r.Delete("/delete/{id}", indicatorHandler.DeleteIndicator)
 	})

@@ -83,6 +83,24 @@ func (g *GlobalParams) GetIndicator(w http.ResponseWriter, r *http.Request) {
 	utils.RespondJSON(w, http.StatusOK, indicator)
 }
 
+// @Summary      Gets all indicators
+// @Description  Retrieves every indicator
+// @Tags         indicator
+// @Produce      json
+// @Success      200  {array}   models.Indicator "Indicators retrieved successfully"
+// @Failure      500  {object}  utils.ErrorResponse "Internal server error"
+// @Router       /indicator/ [get]
+func (g *GlobalParams) GetAllIndicators(w http.ResponseWriter, r *http.Request) {
+	var indicators []models.Indicator
+	res := g.db.Preload("Observations").Find(&indicators)
+	if res.Error != nil {
+		utils.RespondError(w, http.StatusInternalServerError, "Error finding indicators", res.Error)
+		return
+	}
+
+	utils.RespondJSON(w, http.StatusOK, indicators)
+}
+
 // @Summary      Update Indicator
 // @Description  Updates a indicator
 // @Tags         indicator
