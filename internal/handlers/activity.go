@@ -109,7 +109,7 @@ func (g *GlobalParams) GetActivity(w http.ResponseWriter, r *http.Request) {
 	}
 
 	var activity models.Activity
-	res := g.db.Preload("Indicators").First(&activity, "id = ?", id)
+	res := g.db.Preload("Indicators").Preload("Locations").First(&activity, "id = ?", id)
 	if res.Error != nil {
 		if errors.Is(res.Error, gorm.ErrRecordNotFound) {
 			utils.RespondError(w, http.StatusNotFound, "Activity not found", res.Error)
@@ -151,20 +151,38 @@ func (g *GlobalParams) UpdateActivity(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	var reqActivity models.Activity
+	var reqActivity models.ActivityRequest
 	if err := json.NewDecoder(r.Body).Decode(&reqActivity); err != nil {
 		utils.RespondError(w, http.StatusBadRequest, "Invalid JSON", err)
 		return
 	}
 
-	reqActivity.ID = existing.ID
-	res = g.db.Model(&existing).Updates(&reqActivity)
+	activity := models.Activity{
+		ProjectID:     reqActivity.ProjectID,
+		Name:          reqActivity.Name,
+		Description:   reqActivity.Description,
+		Justification: reqActivity.Justification,
+	}
+	locationIDs := reqActivity.LocationIDs
+
+	activity.ID = existing.ID
+	res = g.db.Model(&existing).Omit("Locations").Updates(&activity)
 	if res.Error != nil {
 		utils.RespondError(w, http.StatusInternalServerError, "Error updating activity", res.Error)
 		return
 	}
 
-	utils.RespondJSON(w, http.StatusOK, reqActivity)
+	locations := make([]models.Location, len(locationIDs))
+	for j, id := range locationIDs {
+		locations[j] = models.Location{Model: gorm.Model{ID: id}}
+	}
+
+	if err := g.db.Model(&activity).Association("Locations").Replace(locations); err != nil {
+		utils.RespondError(w, http.StatusInternalServerError, "Error associating locations", err)
+		return
+	}
+
+	utils.RespondJSON(w, http.StatusOK, activity)
 }
 
 // @Summary      Delete Activity
