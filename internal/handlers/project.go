@@ -81,7 +81,14 @@ func (g *GlobalParams) GetProject(w http.ResponseWriter, r *http.Request) {
 	}
 
 	var project models.Project
-	res := g.db.Preload("Locations").Preload("Activities").Preload("ProjectProponents").Preload("ProjectSdgs").First(&project, "id = ?", id)
+	res := g.db.Preload("Locations").
+		Preload("Activities").
+		Preload("Activities.Locations").
+		Preload("Activities.Indicators").
+		Preload("Activities.Indicators.Observations").
+		Preload("ProjectProponents").
+		Preload("ProjectSdgs").
+		First(&project, "id = ?", id)
 	if res.Error != nil {
 		if errors.Is(res.Error, gorm.ErrRecordNotFound) {
 			utils.RespondError(w, http.StatusNotFound, "Project not found", res.Error)
