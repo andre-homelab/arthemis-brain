@@ -471,6 +471,25 @@ paths:
       summary: Health Check
       tags:
       - health
+  /indicator/:
+    get:
+      description: Retrieves every indicator
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Indicators retrieved successfully
+          schema:
+            items:
+              $ref: '#/definitions/models.Indicator'
+            type: array
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/utils.ErrorResponse'
+      summary: Gets all indicators
+      tags:
+      - indicator
   /indicator/{id}:
     get:
       description: Retrieves an indicator
@@ -733,6 +752,25 @@ paths:
       summary: Update Location
       tags:
       - location
+  /observation/:
+    get:
+      description: Retrieves every observation
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Observations retrieved successfully
+          schema:
+            items:
+              $ref: '#/definitions/models.Observation'
+            type: array
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/utils.ErrorResponse'
+      summary: Gets all observations
+      tags:
+      - observation
   /observation/{id}:
     get:
       description: Retrieves an observation
@@ -864,6 +902,27 @@ paths:
       summary: Update Observation
       tags:
       - observation
+  /project/:
+    get:
+      description: Retrieves every project
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Projects retrieved successfully
+          schema:
+            type: boolean
+        "404":
+          description: Projects not found
+          schema:
+            $ref: '#/definitions/utils.ErrorResponse'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/utils.ErrorResponse'
+      summary: Gets all projects
+      tags:
+      - project
   /project/{id}:
     get:
       description: Retrieves a project by ID
@@ -1085,11 +1144,11 @@ paths:
       - application/json
       responses:
         "200":
-          description: Proponent deleted successfully
+          description: Proponents returned successfully
           schema:
             type: boolean
         "404":
-          description: Proponent not found
+          description: Proponents not found
           schema:
             $ref: '#/definitions/utils.ErrorResponse'
         "500":

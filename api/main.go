@@ -67,6 +67,7 @@ func main() {
 	r.Route("/project", func(r chi.Router) {
 		r.Post("/create", projectHandler.CreateProject)
 		r.Get("/{id}", projectHandler.GetProject)
+		r.Get("/", projectHandler.GetAllProjects)
 		r.Put("/update/{id}", projectHandler.UpdateProject)
 		r.Delete("/delete/{id}", projectHandler.DeleteProject)
 		r.Post("/{id}/add_proponent", projectHandler.AddProponent)

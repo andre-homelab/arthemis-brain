@@ -151,8 +151,8 @@ func (g *GlobalParams) DeleteProponent(w http.ResponseWriter, r *http.Request) {
 // @Description  Retrieves every proponent
 // @Tags         proponent
 // @Produce      json
-// @Success      200  {boolean} true    "Proponent deleted successfully"
-// @Failure      404  {object}  utils.ErrorResponse "Proponent not found"
+// @Success      200  {boolean} true    "Proponents returned successfully"
+// @Failure      404  {object}  utils.ErrorResponse "Proponents not found"
 // @Failure      500  {object}  utils.ErrorResponse "Internal server error"
 // @Router       /proponent/ [get]
 func (g *GlobalParams) GetAllProponents(w http.ResponseWriter, r *http.Request) {
@@ -160,10 +160,10 @@ func (g *GlobalParams) GetAllProponents(w http.ResponseWriter, r *http.Request) 
 	res := g.db.Preload("Projects").Find(&proponents)
 	if res.Error != nil {
 		if errors.Is(res.Error, gorm.ErrRecordNotFound) {
-			utils.RespondError(w, http.StatusNotFound, "Proponent not found", res.Error)
+			utils.RespondError(w, http.StatusNotFound, "Proponents not found", res.Error)
 			return
 		}
-		utils.RespondError(w, http.StatusInternalServerError, "Error finding proponent", res.Error)
+		utils.RespondError(w, http.StatusInternalServerError, "Error finding proponents", res.Error)
 		return
 	}
 

@@ -196,6 +196,37 @@ func (g *GlobalParams) DeleteProject(w http.ResponseWriter, r *http.Request) {
 	utils.RespondJSON(w, http.StatusOK, true)
 }
 
+// @Summary      Gets all projects
+// @Description  Retrieves every project
+// @Tags         project
+// @Produce      json
+// @Success      200  {boolean} true    "Projects retrieved successfully"
+// @Failure      404  {object}  utils.ErrorResponse "Projects not found"
+// @Failure      500  {object}  utils.ErrorResponse "Internal server error"
+// @Router       /project/ [get]
+func (g *GlobalParams) GetAllProjects(w http.ResponseWriter, r *http.Request) {
+	var projects []models.Project
+	res := g.db.
+		Preload("Locations").
+		Preload("Activities").
+		Preload("Activities.Locations").
+		Preload("Activities.Indicators").
+		Preload("Activities.Indicators.Observations").
+		Preload("ProjectProponents").
+		Preload("ProjectSdgs").
+		Find(&projects)
+	if res.Error != nil {
+		if errors.Is(res.Error, gorm.ErrRecordNotFound) {
+			utils.RespondError(w, http.StatusNotFound, "No projects found", res.Error)
+			return
+		}
+		utils.RespondError(w, http.StatusInternalServerError, "Error finding projects", res.Error)
+		return
+	}
+
+	utils.RespondJSON(w, http.StatusOK, projects)
+}
+
 type ProponentInput struct {
 	ProponentID uint   `json:"proponentId"`
 	Role        string `json:"role"`
