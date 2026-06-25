@@ -21,7 +21,7 @@ func ObservationHandler(logger *slog.Logger, db *gorm.DB) *GlobalParams {
 // @Description  Creates multiple observations
 // @Tags         observation
 // @Produce      json
-// @Param        observations  body      []models.Observation  true   "List of observation details"
+// @Param        observations  body      []models.ObservationRequest  true   "List of observation details"
 // @Success      202  {array}   uint                "IDs of created observations"
 // @Failure      400  {object}  utils.ErrorResponse "Invalid request body"
 // @Failure      500  {object}  utils.ErrorResponse "Internal server error"
@@ -83,12 +83,30 @@ func (g *GlobalParams) GetObservation(w http.ResponseWriter, r *http.Request) {
 	utils.RespondJSON(w, http.StatusOK, observation)
 }
 
+// @Summary      Gets all observations
+// @Description  Retrieves every observation
+// @Tags         observation
+// @Produce      json
+// @Success      200  {array}   models.Observation "Observations retrieved successfully"
+// @Failure      500  {object}  utils.ErrorResponse "Internal server error"
+// @Router       /observation/ [get]
+func (g *GlobalParams) GetAllObservations(w http.ResponseWriter, r *http.Request) {
+	var observations []models.Observation
+	res := g.db.Find(&observations)
+	if res.Error != nil {
+		utils.RespondError(w, http.StatusInternalServerError, "Error finding observations", res.Error)
+		return
+	}
+
+	utils.RespondJSON(w, http.StatusOK, observations)
+}
+
 // @Summary      Update Observation
 // @Description  Updates a observation
 // @Tags         observation
 // @Produce      json
 // @Param        id    path     string  true   "Observation ID"
-// @Param        project  body      models.Location  true   "Observation details to update"
+// @Param        project  body      models.LocationRequest  true   "Observation details to update"
 // @Success      200  {object}  models.Location    "Observation updated successfully"
 // @Failure      400  {object}  utils.ErrorResponse "ID not informed"
 // @Failure      404  {object}  utils.ErrorResponse "Observation not found"

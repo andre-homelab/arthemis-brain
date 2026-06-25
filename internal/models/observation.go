@@ -13,3 +13,10 @@ type Observation struct {
 	Date        time.Time `gorm:"type:date"`
 	Position    JSONB     `gorm:"type:jsonb"`
 }
+
+type ObservationRequest struct {
+	IndicatorID uint
+	Value       float32
+	Date        time.Time
+	Position    JSONB
+}

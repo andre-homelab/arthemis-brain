@@ -1,12 +1,13 @@
 package handlers
 
 import (
-	"arthemis-brain/internal/models"
-	"arthemis-brain/internal/utils"
 	"encoding/json"
 	"errors"
 	"log/slog"
 	"net/http"
+
+	"arthemis-brain/internal/models"
+	"arthemis-brain/internal/utils"
 
 	"github.com/go-chi/chi/v5"
 	"gorm.io/gorm"
@@ -21,7 +22,7 @@ func ProponentHandler(logger *slog.Logger, db *gorm.DB) *GlobalParams {
 // @Tags         proponent
 // @Accept       json
 // @Produce      json
-// @Param        proponent  body      models.Proponent  true   "Proponent details"
+// @Param        proponent  body      models.ProponentRequest  true   "Proponent details"
 // @Success      202        {boolean} true              "Proponent created successfully"
 // @Failure      400        {object}  utils.ErrorResponse "Invalid JSON or bad request"
 // @Router       /proponent/create [post]
@@ -76,7 +77,7 @@ func (g *GlobalParams) GetProponent(w http.ResponseWriter, r *http.Request) {
 // @Accept       json
 // @Produce      json
 // @Param        id         path      string            true   "Proponent ID"
-// @Param        proponent  body      models.Proponent  true   "Proponent details to update"
+// @Param        proponent  body      models.ProponentRequest  true   "Proponent details to update"
 // @Success      200        {object}  models.Proponent
 // @Failure      400        {object}  utils.ErrorResponse "Invalid JSON or ProponentID not found"
 // @Failure      404        {object}  utils.ErrorResponse "Proponent not found"
@@ -150,8 +151,8 @@ func (g *GlobalParams) DeleteProponent(w http.ResponseWriter, r *http.Request) {
 // @Description  Retrieves every proponent
 // @Tags         proponent
 // @Produce      json
-// @Success      200  {boolean} true    "Proponent deleted successfully"
-// @Failure      404  {object}  utils.ErrorResponse "Proponent not found"
+// @Success      200  {boolean} true    "Proponents returned successfully"
+// @Failure      404  {object}  utils.ErrorResponse "Proponents not found"
 // @Failure      500  {object}  utils.ErrorResponse "Internal server error"
 // @Router       /proponent/ [get]
 func (g *GlobalParams) GetAllProponents(w http.ResponseWriter, r *http.Request) {
@@ -159,10 +160,10 @@ func (g *GlobalParams) GetAllProponents(w http.ResponseWriter, r *http.Request) 
 	res := g.db.Preload("Projects").Find(&proponents)
 	if res.Error != nil {
 		if errors.Is(res.Error, gorm.ErrRecordNotFound) {
-			utils.RespondError(w, http.StatusNotFound, "Proponent not found", res.Error)
+			utils.RespondError(w, http.StatusNotFound, "Proponents not found", res.Error)
 			return
 		}
-		utils.RespondError(w, http.StatusInternalServerError, "Error finding proponent", res.Error)
+		utils.RespondError(w, http.StatusInternalServerError, "Error finding proponents", res.Error)
 		return
 	}
 

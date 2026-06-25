@@ -29,7 +29,7 @@ type CreateActivityRequest struct {
 // @Description  Creates an activity
 // @Tags         activity
 // @Produce      json
-// @Param        activity  body []models.Activity  true   "Activity details"
+// @Param        activity  body []models.ActivityRequest  true   "Activity details"
 // @Success      200  {array}   uint  "Activity created"
 // @Failure      400  {object}  utils.ErrorResponse "No activities provided"
 // @Failure      500  {object}  utils.ErrorResponse "Internal server error"
@@ -109,7 +109,7 @@ func (g *GlobalParams) GetActivity(w http.ResponseWriter, r *http.Request) {
 	}
 
 	var activity models.Activity
-	res := g.db.Preload("Indicators").First(&activity, "id = ?", id)
+	res := g.db.Preload("Indicators").Preload("Locations").First(&activity, "id = ?", id)
 	if res.Error != nil {
 		if errors.Is(res.Error, gorm.ErrRecordNotFound) {
 			utils.RespondError(w, http.StatusNotFound, "Activity not found", res.Error)
@@ -127,7 +127,7 @@ func (g *GlobalParams) GetActivity(w http.ResponseWriter, r *http.Request) {
 // @Tags         activity
 // @Produce      json
 // @Param        id    path     string  true   "Activity ID"
-// @Param        project  body      models.Activity  true   "Activity details to update"
+// @Param        project  body      models.ActivityRequest  true   "Activity details to update"
 // @Success      200  {object}  models.Activity    "Activity updated successfully"
 // @Failure      400  {object}  utils.ErrorResponse "ID not informed"
 // @Failure      404  {object}  utils.ErrorResponse "Activity not found"
@@ -151,20 +151,38 @@ func (g *GlobalParams) UpdateActivity(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	var reqActivity models.Activity
+	var reqActivity models.ActivityRequest
 	if err := json.NewDecoder(r.Body).Decode(&reqActivity); err != nil {
 		utils.RespondError(w, http.StatusBadRequest, "Invalid JSON", err)
 		return
 	}
 
-	reqActivity.ID = existing.ID
-	res = g.db.Model(&existing).Updates(&reqActivity)
+	activity := models.Activity{
+		ProjectID:     reqActivity.ProjectID,
+		Name:          reqActivity.Name,
+		Description:   reqActivity.Description,
+		Justification: reqActivity.Justification,
+	}
+	locationIDs := reqActivity.LocationIDs
+
+	activity.ID = existing.ID
+	res = g.db.Model(&existing).Omit("Locations").Updates(&activity)
 	if res.Error != nil {
 		utils.RespondError(w, http.StatusInternalServerError, "Error updating activity", res.Error)
 		return
 	}
 
-	utils.RespondJSON(w, http.StatusOK, reqActivity)
+	locations := make([]models.Location, len(locationIDs))
+	for j, id := range locationIDs {
+		locations[j] = models.Location{Model: gorm.Model{ID: id}}
+	}
+
+	if err := g.db.Model(&activity).Association("Locations").Replace(locations); err != nil {
+		utils.RespondError(w, http.StatusInternalServerError, "Error associating locations", err)
+		return
+	}
+
+	utils.RespondJSON(w, http.StatusOK, activity)
 }
 
 // @Summary      Delete Activity
@@ -195,4 +213,30 @@ func (g *GlobalParams) DeleteActivity(w http.ResponseWriter, r *http.Request) {
 	}
 
 	utils.RespondJSON(w, http.StatusOK, true)
+}
+
+// @Summary      Get all activities
+// @Description  Retrieves every activity
+// @Tags         activity
+// @Produce      json
+// @Success      200  {boolean} true    "Activities retrieved successfully"
+// @Failure      404  {object}  utils.ErrorResponse "Acitivties not found"
+// @Failure      500  {object}  utils.ErrorResponse "Internal server error"
+// @Router       /activity/ [get]
+func (g *GlobalParams) GetAllActivities(w http.ResponseWriter, r *http.Request) {
+	var activities []models.Activity
+	res := g.db.
+		Preload("Indicators").
+		Preload("Locations").
+		Find(&activities)
+	if res.Error != nil {
+		if errors.Is(res.Error, gorm.ErrRecordNotFound) {
+			utils.RespondError(w, http.StatusNotFound, "No activities found", res.Error)
+			return
+		}
+		utils.RespondError(w, http.StatusInternalServerError, "Error finding activities", res.Error)
+		return
+	}
+
+	utils.RespondJSON(w, http.StatusOK, activities)
 }

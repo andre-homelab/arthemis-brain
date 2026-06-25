@@ -13,3 +13,11 @@ type Activity struct {
 	Locations     []Location `gorm:"many2many:activity_locations;"`
 	Indicators    []Indicator
 }
+
+type ActivityRequest struct {
+	ProjectID     uint
+	Name          string
+	Description   string
+	Justification string
+	LocationIDs   []uint
+}

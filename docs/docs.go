@@ -20,6 +20,38 @@ const docTemplate = `{
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
     "paths": {
+        "/activity/": {
+            "get": {
+                "description": "Retrieves every activity",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "activity"
+                ],
+                "summary": "Get all activities",
+                "responses": {
+                    "200": {
+                        "description": "Activities retrieved successfully",
+                        "schema": {
+                            "type": "boolean"
+                        }
+                    },
+                    "404": {
+                        "description": "Acitivties not found",
+                        "schema": {
+                            "$ref": "#/definitions/utils.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "$ref": "#/definitions/utils.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
         "/activity/create": {
             "post": {
                 "description": "Creates an activity",
@@ -39,7 +71,7 @@ const docTemplate = `{
                         "schema": {
                             "type": "array",
                             "items": {
-                                "$ref": "#/definitions/models.Activity"
+                                "$ref": "#/definitions/models.ActivityRequest"
                             }
                         }
                     }
@@ -140,7 +172,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/models.Activity"
+                            "$ref": "#/definitions/models.ActivityRequest"
                         }
                     }
                 ],
@@ -242,6 +274,35 @@ const docTemplate = `{
                 }
             }
         },
+        "/indicator/": {
+            "get": {
+                "description": "Retrieves every indicator",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "indicator"
+                ],
+                "summary": "Gets all indicators",
+                "responses": {
+                    "200": {
+                        "description": "Indicators retrieved successfully",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/models.Indicator"
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "$ref": "#/definitions/utils.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
         "/indicator/create": {
             "post": {
                 "description": "Creates multiple indicators",
@@ -261,7 +322,7 @@ const docTemplate = `{
                         "schema": {
                             "type": "array",
                             "items": {
-                                "$ref": "#/definitions/models.Indicator"
+                                "$ref": "#/definitions/models.IndicatorRequest"
                             }
                         }
                     }
@@ -362,7 +423,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/models.Indicator"
+                            "$ref": "#/definitions/models.IndicatorRequest"
                         }
                     }
                 ],
@@ -441,6 +502,38 @@ const docTemplate = `{
                 }
             }
         },
+        "/location/": {
+            "get": {
+                "description": "Retrieves every location",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "location"
+                ],
+                "summary": "Get all locations",
+                "responses": {
+                    "200": {
+                        "description": "locations retrieved successfully",
+                        "schema": {
+                            "type": "boolean"
+                        }
+                    },
+                    "404": {
+                        "description": "Acitivties not found",
+                        "schema": {
+                            "$ref": "#/definitions/utils.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "$ref": "#/definitions/utils.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
         "/location/create": {
             "post": {
                 "description": "Creates multiple locations",
@@ -460,7 +553,7 @@ const docTemplate = `{
                         "schema": {
                             "type": "array",
                             "items": {
-                                "$ref": "#/definitions/models.Location"
+                                "$ref": "#/definitions/models.LocationRequest"
                             }
                         }
                     }
@@ -561,7 +654,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/models.Location"
+                            "$ref": "#/definitions/models.LocationRequest"
                         }
                     }
                 ],
@@ -640,6 +733,35 @@ const docTemplate = `{
                 }
             }
         },
+        "/observation/": {
+            "get": {
+                "description": "Retrieves every observation",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "observation"
+                ],
+                "summary": "Gets all observations",
+                "responses": {
+                    "200": {
+                        "description": "Observations retrieved successfully",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/models.Observation"
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "$ref": "#/definitions/utils.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
         "/observation/create": {
             "post": {
                 "description": "Creates multiple observations",
@@ -659,7 +781,7 @@ const docTemplate = `{
                         "schema": {
                             "type": "array",
                             "items": {
-                                "$ref": "#/definitions/models.Observation"
+                                "$ref": "#/definitions/models.ObservationRequest"
                             }
                         }
                     }
@@ -760,7 +882,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/models.Location"
+                            "$ref": "#/definitions/models.LocationRequest"
                         }
                     }
                 ],
@@ -839,6 +961,38 @@ const docTemplate = `{
                 }
             }
         },
+        "/project/": {
+            "get": {
+                "description": "Retrieves every project",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "project"
+                ],
+                "summary": "Gets all projects",
+                "responses": {
+                    "200": {
+                        "description": "Projects retrieved successfully",
+                        "schema": {
+                            "type": "boolean"
+                        }
+                    },
+                    "404": {
+                        "description": "Projects not found",
+                        "schema": {
+                            "$ref": "#/definitions/utils.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "$ref": "#/definitions/utils.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
         "/project/create": {
             "post": {
                 "description": "Creates a new project associated with a proponent ID",
@@ -859,7 +1013,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/models.Project"
+                            "$ref": "#/definitions/models.ProjectRequest"
                         }
                     }
                 ],
@@ -965,7 +1119,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/models.Project"
+                            "$ref": "#/definitions/models.ProjectRequest"
                         }
                     }
                 ],
@@ -1129,7 +1283,7 @@ const docTemplate = `{
                     },
                     {
                         "type": "string",
-                        "description": "Project ID",
+                        "description": "Proponent ID",
                         "name": "proponentId",
                         "in": "path",
                         "required": true
@@ -1175,13 +1329,13 @@ const docTemplate = `{
                 "summary": "Gets all proponents",
                 "responses": {
                     "200": {
-                        "description": "Proponent deleted successfully",
+                        "description": "Proponents returned successfully",
                         "schema": {
                             "type": "boolean"
                         }
                     },
                     "404": {
-                        "description": "Proponent not found",
+                        "description": "Proponents not found",
                         "schema": {
                             "$ref": "#/definitions/utils.ErrorResponse"
                         }
@@ -1215,7 +1369,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/models.Proponent"
+                            "$ref": "#/definitions/models.ProponentRequest"
                         }
                     }
                 ],
@@ -1309,7 +1463,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/models.Proponent"
+                            "$ref": "#/definitions/models.ProponentRequest"
                         }
                     }
                 ],
@@ -1375,6 +1529,231 @@ const docTemplate = `{
                     },
                     "404": {
                         "description": "Proponent not found",
+                        "schema": {
+                            "$ref": "#/definitions/utils.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "$ref": "#/definitions/utils.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/sdg/": {
+            "get": {
+                "description": "Retrieves every sdg",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "sdg"
+                ],
+                "summary": "Gets all Sdgs",
+                "responses": {
+                    "200": {
+                        "description": "Sdg deleted successfully",
+                        "schema": {
+                            "type": "boolean"
+                        }
+                    },
+                    "404": {
+                        "description": "Sdg not found",
+                        "schema": {
+                            "$ref": "#/definitions/utils.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "$ref": "#/definitions/utils.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/sdg/create": {
+            "post": {
+                "description": "Creates a new sdg",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "sdg"
+                ],
+                "summary": "Create Sdg",
+                "parameters": [
+                    {
+                        "description": "Sdg details",
+                        "name": "sdg",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.SdgRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "202": {
+                        "description": "Sdg created successfully",
+                        "schema": {
+                            "type": "boolean"
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid JSON or bad request",
+                        "schema": {
+                            "$ref": "#/definitions/utils.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/sdg/delete/{id}": {
+            "delete": {
+                "description": "Deletes a sdg by ID",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "sdg"
+                ],
+                "summary": "Delete Sdg",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Sdg ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Sdg deleted successfully",
+                        "schema": {
+                            "type": "boolean"
+                        }
+                    },
+                    "400": {
+                        "description": "SdgID not found",
+                        "schema": {
+                            "$ref": "#/definitions/utils.ErrorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Sdg not found",
+                        "schema": {
+                            "$ref": "#/definitions/utils.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "$ref": "#/definitions/utils.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/sdg/update/{id}": {
+            "patch": {
+                "description": "Updates an existing sdg by ID",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "sdg"
+                ],
+                "summary": "Update Sdg",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Sdg ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Sdg details to update",
+                        "name": "sdg",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.SdgRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/models.Sdg"
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid JSON or SdgID not found",
+                        "schema": {
+                            "$ref": "#/definitions/utils.ErrorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Sdg not found",
+                        "schema": {
+                            "$ref": "#/definitions/utils.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "$ref": "#/definitions/utils.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/sdg/{id}": {
+            "get": {
+                "description": "Retrieves a sdg by ID",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "sdg"
+                ],
+                "summary": "Get Sdg",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Sdg ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/models.Sdg"
+                        }
+                    },
+                    "400": {
+                        "description": "SdgID not found",
+                        "schema": {
+                            "$ref": "#/definitions/utils.ErrorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Sdg not found",
                         "schema": {
                             "$ref": "#/definitions/utils.ErrorResponse"
                         }
@@ -1454,6 +1833,29 @@ const docTemplate = `{
                 }
             }
         },
+        "models.ActivityRequest": {
+            "type": "object",
+            "properties": {
+                "description": {
+                    "type": "string"
+                },
+                "justification": {
+                    "type": "string"
+                },
+                "locationIDs": {
+                    "type": "array",
+                    "items": {
+                        "type": "integer"
+                    }
+                },
+                "name": {
+                    "type": "string"
+                },
+                "projectID": {
+                    "type": "integer"
+                }
+            }
+        },
         "models.Indicator": {
             "type": "object",
             "properties": {
@@ -1501,6 +1903,37 @@ const docTemplate = `{
                 }
             }
         },
+        "models.IndicatorRequest": {
+            "type": "object",
+            "properties": {
+                "activityID": {
+                    "type": "integer"
+                },
+                "justification": {
+                    "type": "string"
+                },
+                "locationID": {
+                    "type": "integer"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "observationMethod": {
+                    "type": "string"
+                },
+                "unit": {
+                    "type": "string"
+                },
+                "valueBaseline": {
+                    "type": "number",
+                    "format": "float32"
+                },
+                "valueReference": {
+                    "type": "number",
+                    "format": "float32"
+                }
+            }
+        },
         "models.JSONB": {
             "type": "object",
             "additionalProperties": {}
@@ -1543,6 +1976,27 @@ const docTemplate = `{
                 }
             }
         },
+        "models.LocationRequest": {
+            "type": "object",
+            "properties": {
+                "country": {
+                    "type": "string"
+                },
+                "ecosystem": {
+                    "type": "string"
+                },
+                "extent": {
+                    "type": "number",
+                    "format": "float32"
+                },
+                "position": {
+                    "$ref": "#/definitions/models.JSONB"
+                },
+                "projectID": {
+                    "type": "integer"
+                }
+            }
+        },
         "models.Observation": {
             "type": "object",
             "properties": {
@@ -1569,6 +2023,24 @@ const docTemplate = `{
                 },
                 "value": {
                     "type": "number"
+                }
+            }
+        },
+        "models.ObservationRequest": {
+            "type": "object",
+            "properties": {
+                "date": {
+                    "type": "string"
+                },
+                "indicatorID": {
+                    "type": "integer"
+                },
+                "position": {
+                    "$ref": "#/definitions/models.JSONB"
+                },
+                "value": {
+                    "type": "number",
+                    "format": "float32"
                 }
             }
         },
@@ -1614,6 +2086,12 @@ const docTemplate = `{
                         "$ref": "#/definitions/models.ProjectProponent"
                     }
                 },
+                "projectSdgs": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/models.Sdg"
+                    }
+                },
                 "proponentID": {
                     "type": "integer"
                 },
@@ -1648,6 +2126,32 @@ const docTemplate = `{
                 }
             }
         },
+        "models.ProjectRequest": {
+            "type": "object",
+            "properties": {
+                "justification": {
+                    "type": "string"
+                },
+                "lifetimeEnd": {
+                    "type": "string"
+                },
+                "lifetimeStart": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "proponentID": {
+                    "type": "integer"
+                },
+                "sdgIDs": {
+                    "type": "array",
+                    "items": {
+                        "type": "integer"
+                    }
+                }
+            }
+        },
         "models.Proponent": {
             "type": "object",
             "properties": {
@@ -1674,6 +2178,57 @@ const docTemplate = `{
                 },
                 "updatedAt": {
                     "type": "string"
+                }
+            }
+        },
+        "models.ProponentRequest": {
+            "type": "object",
+            "properties": {
+                "email": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                }
+            }
+        },
+        "models.Sdg": {
+            "type": "object",
+            "properties": {
+                "createdAt": {
+                    "type": "string"
+                },
+                "deletedAt": {
+                    "$ref": "#/definitions/gorm.DeletedAt"
+                },
+                "iconURL": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "number": {
+                    "type": "integer"
+                },
+                "updatedAt": {
+                    "type": "string"
+                }
+            }
+        },
+        "models.SdgRequest": {
+            "type": "object",
+            "properties": {
+                "iconURL": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "number": {
+                    "type": "integer"
                 }
             }
         },

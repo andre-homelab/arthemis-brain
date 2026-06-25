@@ -16,3 +16,14 @@ type Indicator struct {
 	Justification     string  `gorm:"type:text"`
 	Observations      []Observation
 }
+
+type IndicatorRequest struct {
+	ActivityID        uint
+	LocationID        uint
+	Name              string
+	Unit              string
+	ValueBaseline     float32
+	ValueReference    float32
+	ObservationMethod string
+	Justification     string
+}

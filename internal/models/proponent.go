@@ -8,3 +8,8 @@ type Proponent struct {
 	Email    string `gorm:"not null"`
 	Projects []Project
 }
+
+type ProponentRequest struct {
+	Name  string
+	Email string
+}
