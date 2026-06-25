@@ -20,6 +20,38 @@ const docTemplate = `{
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
     "paths": {
+        "/activity/": {
+            "get": {
+                "description": "Retrieves every activity",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "activity"
+                ],
+                "summary": "Get all activities",
+                "responses": {
+                    "200": {
+                        "description": "Activities retrieved successfully",
+                        "schema": {
+                            "type": "boolean"
+                        }
+                    },
+                    "404": {
+                        "description": "Acitivties not found",
+                        "schema": {
+                            "$ref": "#/definitions/utils.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "$ref": "#/definitions/utils.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
         "/activity/create": {
             "post": {
                 "description": "Creates an activity",
@@ -242,6 +274,35 @@ const docTemplate = `{
                 }
             }
         },
+        "/indicator/": {
+            "get": {
+                "description": "Retrieves every indicator",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "indicator"
+                ],
+                "summary": "Gets all indicators",
+                "responses": {
+                    "200": {
+                        "description": "Indicators retrieved successfully",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/models.Indicator"
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "$ref": "#/definitions/utils.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
         "/indicator/create": {
             "post": {
                 "description": "Creates multiple indicators",
@@ -428,6 +489,38 @@ const docTemplate = `{
                     },
                     "404": {
                         "description": "Indicator not found",
+                        "schema": {
+                            "$ref": "#/definitions/utils.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "$ref": "#/definitions/utils.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/location/": {
+            "get": {
+                "description": "Retrieves every location",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "location"
+                ],
+                "summary": "Get all locations",
+                "responses": {
+                    "200": {
+                        "description": "locations retrieved successfully",
+                        "schema": {
+                            "type": "boolean"
+                        }
+                    },
+                    "404": {
+                        "description": "Acitivties not found",
                         "schema": {
                             "$ref": "#/definitions/utils.ErrorResponse"
                         }
@@ -640,6 +733,35 @@ const docTemplate = `{
                 }
             }
         },
+        "/observation/": {
+            "get": {
+                "description": "Retrieves every observation",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "observation"
+                ],
+                "summary": "Gets all observations",
+                "responses": {
+                    "200": {
+                        "description": "Observations retrieved successfully",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/models.Observation"
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "$ref": "#/definitions/utils.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
         "/observation/create": {
             "post": {
                 "description": "Creates multiple observations",
@@ -826,6 +948,38 @@ const docTemplate = `{
                     },
                     "404": {
                         "description": "Observation not found",
+                        "schema": {
+                            "$ref": "#/definitions/utils.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "$ref": "#/definitions/utils.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/project/": {
+            "get": {
+                "description": "Retrieves every project",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "project"
+                ],
+                "summary": "Gets all projects",
+                "responses": {
+                    "200": {
+                        "description": "Projects retrieved successfully",
+                        "schema": {
+                            "type": "boolean"
+                        }
+                    },
+                    "404": {
+                        "description": "Projects not found",
                         "schema": {
                             "$ref": "#/definitions/utils.ErrorResponse"
                         }
@@ -1175,13 +1329,13 @@ const docTemplate = `{
                 "summary": "Gets all proponents",
                 "responses": {
                     "200": {
-                        "description": "Proponent deleted successfully",
+                        "description": "Proponents returned successfully",
                         "schema": {
                             "type": "boolean"
                         }
                     },
                     "404": {
-                        "description": "Proponent not found",
+                        "description": "Proponents not found",
                         "schema": {
                             "$ref": "#/definitions/utils.ErrorResponse"
                         }

@@ -83,6 +83,24 @@ func (g *GlobalParams) GetObservation(w http.ResponseWriter, r *http.Request) {
 	utils.RespondJSON(w, http.StatusOK, observation)
 }
 
+// @Summary      Gets all observations
+// @Description  Retrieves every observation
+// @Tags         observation
+// @Produce      json
+// @Success      200  {array}   models.Observation "Observations retrieved successfully"
+// @Failure      500  {object}  utils.ErrorResponse "Internal server error"
+// @Router       /observation/ [get]
+func (g *GlobalParams) GetAllObservations(w http.ResponseWriter, r *http.Request) {
+	var observations []models.Observation
+	res := g.db.Find(&observations)
+	if res.Error != nil {
+		utils.RespondError(w, http.StatusInternalServerError, "Error finding observations", res.Error)
+		return
+	}
+
+	utils.RespondJSON(w, http.StatusOK, observations)
+}
+
 // @Summary      Update Observation
 // @Description  Updates a observation
 // @Tags         observation

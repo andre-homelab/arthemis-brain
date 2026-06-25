@@ -67,6 +67,7 @@ func main() {
 	r.Route("/project", func(r chi.Router) {
 		r.Post("/create", projectHandler.CreateProject)
 		r.Get("/{id}", projectHandler.GetProject)
+		r.Get("/", projectHandler.GetAllProjects)
 		r.Put("/update/{id}", projectHandler.UpdateProject)
 		r.Delete("/delete/{id}", projectHandler.DeleteProject)
 		r.Post("/{id}/add_proponent", projectHandler.AddProponent)
@@ -77,6 +78,7 @@ func main() {
 	r.Route("/activity", func(r chi.Router) {
 		r.Post("/create", activityHandler.CreateActivity)
 		r.Get("/{id}", activityHandler.GetActivity)
+		r.Get("/", activityHandler.GetAllActivities)
 		r.Put("/update/{id}", activityHandler.UpdateActivity)
 		r.Delete("/delete/{id}", activityHandler.DeleteActivity)
 	})
@@ -85,6 +87,7 @@ func main() {
 	r.Route("/location", func(r chi.Router) {
 		r.Post("/create", locationHandler.CreateLocation)
 		r.Get("/{id}", locationHandler.GetLocation)
+		r.Get("/", locationHandler.GetAllLocations)
 		r.Put("/update/{id}", locationHandler.UpdateLocation)
 		r.Delete("/delete/{id}", locationHandler.DeleteLocation)
 	})
@@ -93,6 +96,7 @@ func main() {
 	r.Route("/indicator", func(r chi.Router) {
 		r.Post("/create", indicatorHandler.CreateIndicator)
 		r.Get("/{id}", indicatorHandler.GetIndicator)
+		r.Get("/", indicatorHandler.GetAllIndicators)
 		r.Put("/update/{id}", indicatorHandler.UpdateIndicator)
 		r.Delete("/delete/{id}", indicatorHandler.DeleteIndicator)
 	})
@@ -109,6 +113,7 @@ func main() {
 	observationHandler := handlers.ObservationHandler(logger, db)
 	r.Route("/observation", func(r chi.Router) {
 		r.Post("/create", observationHandler.CreateObservations)
+		r.Get("/", observationHandler.GetAllObservations)
 		r.Get("/{id}", observationHandler.GetObservation)
 		r.Patch("/update/{id}", observationHandler.UpdateObservation)
 		r.Delete("/delete/{id}", observationHandler.DeleteObservation)
