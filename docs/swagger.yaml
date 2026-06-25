@@ -325,6 +325,27 @@ info:
   title: Arthemis Brain API
   version: "1.0"
 paths:
+  /activity/:
+    get:
+      description: Retrieves every activity
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Activities retrieved successfully
+          schema:
+            type: boolean
+        "404":
+          description: Acitivties not found
+          schema:
+            $ref: '#/definitions/utils.ErrorResponse'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/utils.ErrorResponse'
+      summary: Get all activities
+      tags:
+      - activity
   /activity/{id}:
     get:
       description: Retrieves an activity
@@ -621,6 +642,27 @@ paths:
       summary: Update Indicator
       tags:
       - indicator
+  /location/:
+    get:
+      description: Retrieves every location
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: locations retrieved successfully
+          schema:
+            type: boolean
+        "404":
+          description: Acitivties not found
+          schema:
+            $ref: '#/definitions/utils.ErrorResponse'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/utils.ErrorResponse'
+      summary: Get all locations
+      tags:
+      - location
   /location/{id}:
     get:
       description: Retrieves a location

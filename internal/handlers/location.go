@@ -157,3 +157,26 @@ func (g *GlobalParams) DeleteLocation(w http.ResponseWriter, r *http.Request) {
 
 	utils.RespondJSON(w, http.StatusOK, true)
 }
+
+// @Summary      Get all locations
+// @Description  Retrieves every location
+// @Tags         location
+// @Produce      json
+// @Success      200  {boolean} true    "locations retrieved successfully"
+// @Failure      404  {object}  utils.ErrorResponse "Acitivties not found"
+// @Failure      500  {object}  utils.ErrorResponse "Internal server error"
+// @Router       /location/ [get]
+func (g *GlobalParams) GetAllLocations(w http.ResponseWriter, r *http.Request) {
+	var locations []models.Location
+	res := g.db.Find(&locations)
+	if res.Error != nil {
+		if errors.Is(res.Error, gorm.ErrRecordNotFound) {
+			utils.RespondError(w, http.StatusNotFound, "No locations found", res.Error)
+			return
+		}
+		utils.RespondError(w, http.StatusInternalServerError, "Error finding locations", res.Error)
+		return
+	}
+
+	utils.RespondJSON(w, http.StatusOK, locations)
+}

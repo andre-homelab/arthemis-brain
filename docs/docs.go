@@ -20,6 +20,38 @@ const docTemplate = `{
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
     "paths": {
+        "/activity/": {
+            "get": {
+                "description": "Retrieves every activity",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "activity"
+                ],
+                "summary": "Get all activities",
+                "responses": {
+                    "200": {
+                        "description": "Activities retrieved successfully",
+                        "schema": {
+                            "type": "boolean"
+                        }
+                    },
+                    "404": {
+                        "description": "Acitivties not found",
+                        "schema": {
+                            "$ref": "#/definitions/utils.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "$ref": "#/definitions/utils.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
         "/activity/create": {
             "post": {
                 "description": "Creates an activity",
@@ -457,6 +489,38 @@ const docTemplate = `{
                     },
                     "404": {
                         "description": "Indicator not found",
+                        "schema": {
+                            "$ref": "#/definitions/utils.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "$ref": "#/definitions/utils.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/location/": {
+            "get": {
+                "description": "Retrieves every location",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "location"
+                ],
+                "summary": "Get all locations",
+                "responses": {
+                    "200": {
+                        "description": "locations retrieved successfully",
+                        "schema": {
+                            "type": "boolean"
+                        }
+                    },
+                    "404": {
+                        "description": "Acitivties not found",
                         "schema": {
                             "$ref": "#/definitions/utils.ErrorResponse"
                         }

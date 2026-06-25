@@ -214,3 +214,29 @@ func (g *GlobalParams) DeleteActivity(w http.ResponseWriter, r *http.Request) {
 
 	utils.RespondJSON(w, http.StatusOK, true)
 }
+
+// @Summary      Get all activities
+// @Description  Retrieves every activity
+// @Tags         activity
+// @Produce      json
+// @Success      200  {boolean} true    "Activities retrieved successfully"
+// @Failure      404  {object}  utils.ErrorResponse "Acitivties not found"
+// @Failure      500  {object}  utils.ErrorResponse "Internal server error"
+// @Router       /activity/ [get]
+func (g *GlobalParams) GetAllActivities(w http.ResponseWriter, r *http.Request) {
+	var activities []models.Activity
+	res := g.db.
+		Preload("Indicators").
+		Preload("Locations").
+		Find(&activities)
+	if res.Error != nil {
+		if errors.Is(res.Error, gorm.ErrRecordNotFound) {
+			utils.RespondError(w, http.StatusNotFound, "No activities found", res.Error)
+			return
+		}
+		utils.RespondError(w, http.StatusInternalServerError, "Error finding activities", res.Error)
+		return
+	}
+
+	utils.RespondJSON(w, http.StatusOK, activities)
+}

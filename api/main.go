@@ -78,6 +78,7 @@ func main() {
 	r.Route("/activity", func(r chi.Router) {
 		r.Post("/create", activityHandler.CreateActivity)
 		r.Get("/{id}", activityHandler.GetActivity)
+		r.Get("/", activityHandler.GetAllActivities)
 		r.Put("/update/{id}", activityHandler.UpdateActivity)
 		r.Delete("/delete/{id}", activityHandler.DeleteActivity)
 	})
@@ -86,6 +87,7 @@ func main() {
 	r.Route("/location", func(r chi.Router) {
 		r.Post("/create", locationHandler.CreateLocation)
 		r.Get("/{id}", locationHandler.GetLocation)
+		r.Get("/", locationHandler.GetAllLocations)
 		r.Put("/update/{id}", locationHandler.UpdateLocation)
 		r.Delete("/delete/{id}", locationHandler.DeleteLocation)
 	})
